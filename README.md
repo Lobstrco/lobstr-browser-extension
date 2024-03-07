@@ -1,4 +1,4 @@
-# LOBSTR
+# LOBSTR browser extension
 
 This repo is constructed using yarn workspaces and consists of the 3 sections:
 
