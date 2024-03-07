@@ -1,7 +1,7 @@
 {
   "name": "@lobstr/extension-api",
   "version": "1.0.0-beta.0",
-  "license": "Apache-2.0",
+  "license": "GNU GPLv3",
   "description": "",
   "repository": {
     "url": "",
