@@ -1,0 +1,34 @@
+{
+  "name": "LOBSTR SIGNER EXTENSION",
+  "version": "1.0.0",
+  "version_name": "1.0.0",
+  "description": "",
+  "background": {
+    "scripts": ["background.min.js"],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["contentScript.min.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "browser_action": {
+    "default_popup": "index.html",
+    "default_icon": {
+      "16": "images/icon16.png",
+      "32": "images/icon32.png",
+      "48": "images/icon48.png",
+      "128": "images/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "images/icon16.png",
+    "32": "images/icon32.png",
+    "48": "images/icon48.png",
+    "128": "images/icon128.png"
+  },
+  "permissions": ["storage", "alarms"],
+  "manifest_version": 2
+}

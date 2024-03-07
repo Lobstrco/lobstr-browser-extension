@@ -1,0 +1,51 @@
+{
+  "name": "extension",
+  "version": "1.0.0-beta.0",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "webpack --config webpack.extension.js",
+    "build:production": "yarn build --env PRODUCTION",
+    "start": "webpack-dev-server --config webpack.dev.js",
+    "start:unpacked-extension": "yarn build --watch"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^2.1.0",
+    "@shared/api": "1.0.0",
+    "@shared/constants": "1.0.0",
+    "@types/chrome": "^0.0.259",
+    "@types/node": "^20.11.10",
+    "@types/react-dom": "^18.2.18",
+    "@types/react-redux": "^7.1.33",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/uuid": "^9.0.8",
+    "@types/webextension-polyfill": "^0.10.7",
+    "buffer": "^6.0.3",
+    "copy-webpack-plugin": "^12.0.2",
+    "history": "^4",
+    "html-loader": "^5.0.0",
+    "html-webpack-plugin": "^5.5.3",
+    "mini-css-extract-plugin": "^2.7.7",
+    "punycode": "^2.3.1",
+    "qrcode.react": "^3.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-redux": "^9.1.0",
+    "react-router-dom": "^6.21.3",
+    "redux": "^5.0.1",
+    "stellar-identicon-js": "^1.0.0",
+    "styled-components": "^6.1.8",
+    "tsconfig-paths-webpack-plugin": "^4.1.0",
+    "uuid": "^9.0.1",
+    "webextension-polyfill": "^0.10.0"
+  },
+  "devDependencies": {
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.1",
+    "process": "^0.11.10",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.1",
+    "util": "^0.12.5"
+  }
+}

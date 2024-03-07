@@ -1,0 +1,19 @@
+<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6667 14H12C13.1046 14 14 13.1046 14 12V10.6667H12.5V12C12.5 12.2761 12.2761 12.5 12 12.5H10.6667V14ZM10.6667 3.5H12C12.2761 3.5 12.5 3.72386 12.5 4V5.33333H14V4C14 2.89543 13.1046 2 12 2H10.6667V3.5ZM5.33333 2V3.5H4C3.72386 3.5 3.5 3.72386 3.5 4V5.33333H2V4C2 2.89543 2.89543 2 4 2H5.33333ZM5.33333 12.5V14H4C2.89543 14 2 13.1046 2 12V10.6667H3.5V12C3.5 12.2761 3.72386 12.5 4 12.5H5.33333Z" fill="#1F4B65"/>
+    <mask id="path-2-inside-1_1740_41742" fill="white">
+        <rect x="4.33325" y="4.33333" width="3.33333" height="3.33333" rx="0.666667"/>
+    </mask>
+    <rect x="4.33325" y="4.33333" width="3.33333" height="3.33333" rx="0.666667" stroke="#1F4B65" stroke-width="2" mask="url(#path-2-inside-1_1740_41742)"/>
+    <mask id="path-3-inside-2_1740_41742" fill="white">
+        <rect x="4.33325" y="8.33334" width="3.33333" height="3.33333" rx="0.666667"/>
+    </mask>
+    <rect x="4.33325" y="8.33334" width="3.33333" height="3.33333" rx="0.666667" stroke="#1F4B65" stroke-width="2" mask="url(#path-3-inside-2_1740_41742)"/>
+    <mask id="path-4-inside-3_1740_41742" fill="white">
+        <rect x="8.33325" y="4.33333" width="3.33333" height="3.33333" rx="0.666667"/>
+    </mask>
+    <rect x="8.33325" y="4.33333" width="3.33333" height="3.33333" rx="0.666667" stroke="#1F4B65" stroke-width="2" mask="url(#path-4-inside-3_1740_41742)"/>
+    <mask id="path-5-inside-4_1740_41742" fill="white">
+        <rect x="8.66675" y="8.66667" width="2.66667" height="2.66667" rx="0.666667"/>
+    </mask>
+    <rect x="8.66675" y="8.66667" width="2.66667" height="2.66667" rx="0.666667" fill="#1F4B65" stroke="#1F4B65" stroke-width="2" mask="url(#path-5-inside-4_1740_41742)"/>
+</svg>

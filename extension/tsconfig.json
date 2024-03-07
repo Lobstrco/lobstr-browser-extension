@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "src/",
+    "types": [
+      "@types/chrome",
+      "node"
+    ]
+  },
+  "include": ["src", "public"],
+  "exclude": ["build"]
+}
