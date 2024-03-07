@@ -2,12 +2,17 @@ import { signTransaction as signTransactionService } from "@shared/api/external"
 import { CONNECTION_KEY } from "@shared/constants/services";
 import { isBrowser } from "./index";
 
-export const signTransaction = (transactionXdr: string): Promise<string> => {
+const getConnectionKey = () =>
+  window?.sessionStorage?.getItem(CONNECTION_KEY) || "";
+
+export const signTransaction = async (
+  transactionXdr: string,
+): Promise<string> => {
   if (!isBrowser) {
-    return Promise.resolve("");
+    return "";
   }
 
-  const connectionKey = window?.sessionStorage?.getItem(CONNECTION_KEY) || "";
+  const connectionKey = getConnectionKey();
 
-  return signTransactionService(transactionXdr, connectionKey);
+  return await signTransactionService(transactionXdr, connectionKey);
 };

@@ -3,12 +3,16 @@ import { GetPublicKeyResponse } from "@shared/constants/types";
 import { CONNECTION_KEY } from "@shared/constants/services";
 import { isBrowser } from "./index";
 
-export const getPublicKey = (): Promise<string> =>
-  isBrowser
-    ? requestPublicKey().then(
-        ({ publicKey, connectionKey }: GetPublicKeyResponse) => {
-          window?.sessionStorage?.setItem(CONNECTION_KEY, connectionKey);
-          return publicKey;
-        },
-      )
-    : Promise.resolve("");
+const saveConnectionKey = (connectionKey: string) => {
+  window?.sessionStorage?.setItem(CONNECTION_KEY, connectionKey);
+};
+
+export const getPublicKey = async (): Promise<string> => {
+  if (!isBrowser) {
+    return "";
+  }
+  const { publicKey, connectionKey }: GetPublicKeyResponse =
+    await requestPublicKey();
+  saveConnectionKey(connectionKey);
+  return publicKey;
+};

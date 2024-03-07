@@ -1,7 +1,7 @@
 {
-  "name": "LOBSTR SIGNER EXTENSION",
-  "version": "1.0.0",
-  "version_name": "1.0.0",
+  "name": "LOBSTR",
+  "version": "1.0.0-beta.0",
+  "version_name": "1.0.0-beta.0",
   "description": "",
   "background": {
     "scripts": ["background.min.js"],

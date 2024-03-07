@@ -1,12 +1,14 @@
 import { requestConnectionStatus } from "@shared/api/external";
 import { isBrowser } from "./index";
 
-export const isConnected = (): Promise<boolean> => {
-  if (!isBrowser) return Promise.resolve(false);
-
-  if (window.lobstrSignerExtension) {
-    return Promise.resolve(window.lobstrSignerExtension);
+export const isConnected = async (): Promise<boolean> => {
+  if (!isBrowser) {
+    return false;
   }
 
-  return requestConnectionStatus();
+  if (window.lobstrSignerExtension) {
+    return window.lobstrSignerExtension;
+  }
+
+  return await requestConnectionStatus();
 };
