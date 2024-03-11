@@ -130,7 +130,6 @@ const GrantAccess = () => {
     if (!allAccounts.length) {
       return [];
     }
-    console.log(allAccounts);
     return [...allAccounts].sort(
       (a, b) => b.lastActivityTime - a.lastActivityTime,
     );

@@ -1,7 +1,7 @@
 {
   "name": "extension",
   "version": "1.0.0-beta.0",
-  "license": "GNU GPLv3",
+  "license": "GPL-3.0",
   "scripts": {
     "build": "webpack --config webpack.extension.js",
     "build:production": "yarn build --env PRODUCTION",

@@ -24,37 +24,46 @@ import {
 const localStore = dataStorageAccess(browserLocalStorage);
 
 interface WINDOW_PARAMS {
-  height: number;
   type: "popup";
   width: number;
+  height: number;
+  top: number;
+  left: number;
 }
 
-const WINDOW_SETTINGS: WINDOW_PARAMS = {
-  type: "popup",
-  width: POPUP_WIDTH,
-  height: POPUP_HEIGHT + 32, // include browser frame height,
+export const getWindowSettings = async (): Promise<WINDOW_PARAMS> => {
+  const currentWindow = await browser.windows.getCurrent();
+  const platform = await chrome.runtime.getPlatformInfo();
+  const frameSize = platform.os === "win" ? 40 : 32;
+
+  return {
+    type: "popup",
+    width: POPUP_WIDTH,
+    height: POPUP_HEIGHT + frameSize,
+    top: (currentWindow?.top || 0) + POPUP_OFFSET_TOP,
+    left:
+      (currentWindow?.width || 0) +
+      (currentWindow?.left || 0) -
+      POPUP_WIDTH -
+      POPUP_OFFSET_RIGHT,
+  };
 };
 
 export const signerExtensionApiMessageListener = (
   request: ExternalRequestTx,
   sender: browser.Runtime.MessageSender,
 ) => {
-  const requestAccess = () => {
+  const requestAccess = async () => {
     const { tab, url: tabUrl = "" } = sender;
     const encodeOrigin = encodeObject({ tab, url: tabUrl });
-    browser.windows.getCurrent().then((currentWindow) => {
-      browser.windows.create({
-        url: chrome.runtime.getURL(
-          `/index.html#${ROUTES.grantAccess}?${encodeOrigin}`,
-        ),
-        top: (currentWindow?.top || 0) + POPUP_OFFSET_TOP,
-        left:
-          (currentWindow?.width || 0) +
-          (currentWindow?.left || 0) -
-          POPUP_WIDTH -
-          POPUP_OFFSET_RIGHT,
-        ...WINDOW_SETTINGS,
-      });
+
+    const settings = await getWindowSettings();
+
+    browser.windows.create({
+      url: chrome.runtime.getURL(
+        `/index.html#${ROUTES.grantAccess}?${encodeOrigin}`,
+      ),
+      ...settings,
     });
 
     return new Promise((resolve) => {
@@ -102,18 +111,12 @@ export const signerExtensionApiMessageListener = (
     transactionQueue.push({ transactionXdr, connectionKey, domain });
     const encodedBlob = encodeObject(info);
 
-    const currentWindow = await browser.windows.getCurrent();
+    const settings = await getWindowSettings();
     const popup = await browser.windows.create({
       url: chrome.runtime.getURL(
         `/index.html#${ROUTES.sendTransaction}?${encodedBlob}`,
       ),
-      top: (currentWindow?.top || 0) + POPUP_OFFSET_TOP,
-      left:
-        (currentWindow?.width || 0) +
-        (currentWindow?.left || 0) -
-        POPUP_WIDTH -
-        POPUP_OFFSET_RIGHT,
-      ...WINDOW_SETTINGS,
+      ...settings,
     });
 
     return new Promise((resolve) => {

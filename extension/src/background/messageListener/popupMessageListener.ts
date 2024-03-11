@@ -161,8 +161,10 @@ export const popupMessageListener = (request: Request, sessionStore: Store) => {
 
       const allAccounts = allAccountsSelector(sessionStore.getState());
 
+      const filteredAccounts = await _filterInactiveConnections(allAccounts);
+
       const updatedAccounts = [
-        ...allAccounts,
+        ...filteredAccounts,
         { publicKey, federation, connectionKey, userAgent, lastActivityTime },
       ];
 

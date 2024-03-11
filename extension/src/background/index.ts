@@ -6,13 +6,10 @@ import {
 } from "@shared/constants/services";
 
 import { popupMessageListener } from "./messageListener/popupMessageListener";
-import { signerExtensionApiMessageListener } from "./messageListener/signerExtensionApiMessageListener";
 import {
-  POPUP_HEIGHT,
-  POPUP_OFFSET_TOP,
-  POPUP_OFFSET_RIGHT,
-  POPUP_WIDTH,
-} from "./constants/dimensions";
+  getWindowSettings,
+  signerExtensionApiMessageListener,
+} from "./messageListener/signerExtensionApiMessageListener";
 import { ROUTES } from "popup/constants/routes";
 
 export const initContentScriptMessageListener = () => {
@@ -45,19 +42,10 @@ export const initInstalledListener = () => {
     if (temporary) return; // skip during development
     switch (reason) {
       case "install":
-        const currentWindow = await browser.windows.getCurrent();
-        console.log(currentWindow);
+        const settings = await getWindowSettings();
         await browser.windows.create({
           url: chrome.runtime.getURL(`index.html#${ROUTES.welcome}`),
-          type: "popup",
-          width: POPUP_WIDTH,
-          height: POPUP_HEIGHT + 32,
-          top: (currentWindow?.top || 0) + POPUP_OFFSET_TOP,
-          left:
-            (currentWindow?.width || 0) +
-            (currentWindow?.left || 0) -
-            POPUP_WIDTH -
-            POPUP_OFFSET_RIGHT,
+          ...settings,
         });
         break;
       // TODO: case "update":

@@ -47,7 +47,7 @@ const Loader = styled.div`
   height: 9.6rem;
   border-radius: 50%;
   background: linear-gradient(#00abff 0%, #fff 25%, #fff 100%);
-  animation: animate 0.75s linear infinite;
+  animation: animate 1.5s linear infinite;
 
   &::before {
     position: absolute;
