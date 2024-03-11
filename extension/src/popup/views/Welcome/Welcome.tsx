@@ -24,6 +24,7 @@ const Wrapper = styled.div`
 const Title = styled.h3`
   ${TitleStyles};
   margin-top: 2.4rem;
+  white-space: nowrap;
 `;
 
 const Description = styled.span`
