@@ -16,6 +16,7 @@ const Container = styled.div`
   max-height: ${POPUP_HEIGHT}px;
   min-height: ${POPUP_HEIGHT}px;
   max-width: ${POPUP_WIDTH}px;
+  min-width: ${POPUP_WIDTH}px;
   width: 100%;
   display: flex;
   flex-direction: column;

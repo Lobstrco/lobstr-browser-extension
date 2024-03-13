@@ -53,7 +53,7 @@ const DashedLine = styled.div`
 const TitleBlock = styled.div`
   ${FlexAllCenter};
   flex-direction: column;
-  margin-bottom: 2.3rem;
+  margin-bottom: 2rem;
 `;
 
 const Title = styled.h3`

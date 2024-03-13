@@ -58,11 +58,11 @@ const Highlighted = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 0.8rem;
-  color: ${COLORS.darkGray}};
+  color: ${COLORS.darkGray};
 `;
 
 const QrContainer = styled.div`
-  margin: 4.8rem auto;
+  margin: 4.6rem auto;
 `;
 
 const DontHaveLobstr = styled.div`
