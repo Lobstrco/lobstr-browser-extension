@@ -3,18 +3,20 @@ import { signTransaction } from "../signTransaction";
 import { getPublicKey } from "../getPublicKey";
 
 describe("signTransaction", () => {
-  describe("successfull case", () => {
+  describe("success case", () => {
     const INITIAL_XDR = "unsigned";
     const SIGNED_XDR = "signed";
     const TEST_CONNECTION_KEY = "xxxx-xxxx-xxxx";
 
     // call getPublicKey to test saving connectionKey
-    apiExternal.requestPublicKey = jest.fn().mockReturnValue({
+    jest.spyOn(apiExternal, "requestPublicKey", null).mockReturnValue({
       connectionKey: TEST_CONNECTION_KEY,
     });
     getPublicKey();
 
-    apiExternal.signTransaction = jest.fn().mockReturnValue(SIGNED_XDR);
+    jest
+      .spyOn(apiExternal, "signTransaction", null)
+      .mockReturnValue(Promise.resolve(SIGNED_XDR));
 
     it("returns a transaction", async () => {
       const transaction = await signTransaction(INITIAL_XDR);
@@ -31,9 +33,11 @@ describe("signTransaction", () => {
   describe("fail case", () => {
     it("throws a generic error", () => {
       const TEST_ERROR = "Error!";
-      apiExternal.signTransaction = jest.fn().mockImplementation(() => {
-        throw TEST_ERROR;
-      });
+      jest
+        .spyOn(apiExternal, "signTransaction", null)
+        .mockImplementation(() => {
+          throw TEST_ERROR;
+        });
       expect(signTransaction).rejects.toBe(TEST_ERROR);
     });
   });

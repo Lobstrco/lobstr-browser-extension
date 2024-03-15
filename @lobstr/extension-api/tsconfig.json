@@ -10,9 +10,6 @@
       "@shared/*": ["../../../@shared/*"]
     }
   },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "build", "node_modules"]
+  "include": ["src"],
+  "exclude": ["build", "node_modules", "src/**/*.test.js"]
 }

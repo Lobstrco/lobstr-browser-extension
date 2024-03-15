@@ -23,6 +23,8 @@
     "start:extension-api": "yarn workspace @lobstr/extension-api start",
     "start:unpacked": "yarn workspace extension start:unpacked-extension",
     "start": "run-p --print-label start:extension-api start:extension start:unpacked",
+    "test:ci": "jest --ci",
+    "test:e2e": "yarn workspace extension test:e2e",
     "test": "jest -o --watch"
   },
   "browserslist": {
