@@ -3,7 +3,7 @@ import { CONNECTION_KEY } from "@shared/constants/services";
 import { getPublicKey } from "../getPublicKey";
 
 describe("getPublicKey", () => {
-  describe("successfull case", () => {
+  describe("success case", () => {
     const TEST_PUBLIC_KEY = "GXXXXXXX....XXXXXXX";
     const TEST_CONNECTION_KEY = "xxxxx-xxxxxx-xxxxxx";
 

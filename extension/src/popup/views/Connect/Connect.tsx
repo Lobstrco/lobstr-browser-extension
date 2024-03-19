@@ -159,7 +159,7 @@ const Connect = () => {
             Scan <img src={QR} alt="QR" />
           </Highlighted>
         </Instruction>
-        <QrContainer>
+        <QrContainer className="test_wrapper">
           <QRCode
             value={`lobstr-extension://${applicationId}/${uuid}`}
             renderAs="canvas"

@@ -6,7 +6,8 @@
     "build": "webpack --config webpack.extension.js",
     "build:production": "yarn build --env PRODUCTION",
     "start": "webpack-dev-server --config webpack.dev.js",
-    "start:unpacked-extension": "yarn build --watch"
+    "start:unpacked-extension": "yarn build --watch",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.1.0",
