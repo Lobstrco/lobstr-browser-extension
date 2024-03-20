@@ -7,7 +7,7 @@ from npm and then integrate with LOBSTR using dev-friendly methods.
 ## Getting Started
 To get started, you'll need both the LOBSTR extension and the API needed to integrate with it.
 
-### Install the Freighter extension.
+### Install the LOBSTR extension.
 You'll want a local version of the extension to test with.
 
 - Head over to the Chrome extension store and install LOBSTR into your browser.
