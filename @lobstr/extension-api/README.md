@@ -45,9 +45,7 @@ or import just the modules you require:
 import {
 isConnected,
 getPublicKey,
-signAuthEntry,
 signTransaction,
-signBlob,
 } from "@lobstr/extension-api";
 ```
 
