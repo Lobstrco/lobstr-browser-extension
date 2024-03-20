@@ -43,9 +43,9 @@ or import just the modules you require:
 
 ```javascript
 import {
-isConnected,
-getPublicKey,
-signTransaction,
+ isConnected,
+ getPublicKey,
+ signTransaction,
 } from "@lobstr/extension-api";
 ```
 
