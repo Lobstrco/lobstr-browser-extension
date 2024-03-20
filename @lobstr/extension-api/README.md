@@ -29,14 +29,14 @@ Install the packaged library via script tag using cdnjs, swapping in the desired
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lobstr-extension-api/{version}/index.min.js"></script>
 ```
 
-## Using Freighter in a web app
+## Using LOBSTR in a web app
 We now have an extension installed on our machine and a library to interact with it. This library will provide you methods to send and receive data from a user's extension in your website or application.
 
 ### Importing
 First import the whole library in an ES2023 application
 
 ```javascript
-import freighterApi from "@lobstr/extension-api";
+import lobstrApi from "@lobstr/extension-api";
 ```
 
 or import just the modules you require:
