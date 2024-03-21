@@ -19,7 +19,6 @@ import { Menu, MenuItem, MenuItemLink } from "../../basics/Menu/Menu";
 import useOnClickOutside from "../../helpers/useOutsideClick";
 import { AppDispatch } from "../../App";
 import { List } from "../../basics/List/List";
-import Plus from "popup/assets/icon-plus.svg";
 import Dots from "popup/assets/icon-three-dots.svg";
 
 const Wrapper = styled.div`
@@ -117,9 +116,6 @@ const Wallets = () => {
             <Title>Connected wallets</Title>
             <Description>Your wallets connected to extension</Description>
           </div>
-          <WalletButton onClick={() => navigateTo(ROUTES.connect)}>
-            <img src={Plus} alt="+" />
-          </WalletButton>
         </Header>
         <WalletsList $withScroll={allAccounts.length > 3}>
           {allAccounts.map(
