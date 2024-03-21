@@ -141,11 +141,11 @@ const SendTransaction = () => {
           <Icon src={SignIcon} alt="sign" />
         </IconWrapper>
 
-        <Title>Check your mobile app</Title>
+        <Title>Continue in LOBSTR app</Title>
         <Description>
-          We’ve sent a connection request to your phone.
+          We've sent a signature request to the LOBSTR app on your phone.
           <br />
-          Check your LOBSTR Wallet app to continue.
+          Review the details and confirm to sign the transaction.
         </Description>
       </Wrapper>
       <AccountBlock>

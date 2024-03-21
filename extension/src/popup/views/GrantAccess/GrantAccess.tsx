@@ -176,14 +176,14 @@ const GrantAccess = () => {
           </IconWrapper>
         </Icons>
         <TitleBlock>
-          <Title>Connect to website</Title>
+          <Title>Connection request</Title>
           <Domain>{domain}</Domain>
         </TitleBlock>
       </Wrapper>
       <ListHeader>
-        <span>Choose wallet to use with this website</span>
+        <span>Choose a wallet to use with this website</span>
         <AddAccountButton onClick={() => navigateTo(ROUTES.connect)}>
-          Add New
+          Connect Wallet
         </AddAccountButton>
       </ListHeader>
       <Wrapper>

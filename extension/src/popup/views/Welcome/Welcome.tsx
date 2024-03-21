@@ -19,6 +19,7 @@ const Image = styled.img`
 
 const Wrapper = styled.div`
   ${WrapperStyles};
+  height: 100%;
 `;
 
 const Title = styled.h3`
@@ -27,21 +28,21 @@ const Title = styled.h3`
   white-space: nowrap;
 `;
 
-const Description = styled.span`
+const Description = styled.div`
   ${DescriptionStyles};
   margin-top: 0.8rem;
   text-align: center;
-  margin-bottom: 6.5rem;
+  margin-bottom: auto;
 `;
 
 const Welcome = () => (
   <Popup>
     <Wrapper>
       <Image src={Onboarding} alt="Onboarding" />
-      <Title>Welcome to LOBSTR Extension</Title>
+      <Title>Welcome to LOBSTR extension</Title>
       <Description>
-        Connect your LOBSTR Wallet mobile app
-        <br /> to interact with various dApps and services
+        Securely connect to decentralized services on the Stellar network and
+        sign transactions with your LOBSTR wallet.
       </Description>
       <Button fullWidth onClick={() => navigateTo(ROUTES.connect)}>
         Get Started

@@ -114,7 +114,9 @@ const Wallets = () => {
         <Header>
           <div>
             <Title>Connected wallets</Title>
-            <Description>Your wallets connected to extension</Description>
+            <Description>
+              Your Stellar wallets connected to the extension
+            </Description>
           </div>
         </Header>
         <WalletsList $withScroll={allAccounts.length > 3}>
@@ -132,7 +134,7 @@ const Wallets = () => {
                 {menuKey === connectionKey && (
                   <StyledMenu ref={ref}>
                     <MenuItem onClick={() => disconnect(connectionKey)}>
-                      Disconnect wallet
+                      Remove connection
                     </MenuItem>
                     <MenuItemLink
                       target="_blank"
@@ -147,9 +149,9 @@ const Wallets = () => {
           )}
         </WalletsList>
         <AddAccount>
-          <span>Or you could add another wallet here</span>
+          <span>Connect additional wallets here</span>
           <AddAccountButton onClick={() => navigateTo(ROUTES.connect)}>
-            Add New
+            Connect Wallet
           </AddAccountButton>
         </AddAccount>
       </Wrapper>

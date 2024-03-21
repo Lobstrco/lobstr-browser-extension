@@ -37,7 +37,7 @@ const Wrapper = styled.div`
 
 const Title = styled.h3`
   ${TitleStyles};
-  margin-top: 2.4rem;
+  margin-top: 1.4rem;
   margin-bottom: 0.4rem;
 `;
 
@@ -62,7 +62,7 @@ const Highlighted = styled.div`
 `;
 
 const QrContainer = styled.div`
-  margin: 4.6rem auto;
+  margin: 1.6rem auto;
 `;
 
 const DontHaveLobstr = styled.div`
@@ -148,17 +148,24 @@ const Connect = () => {
             <span>Back</span>
           </BackButton>
         )}
-        <Title>Scan to connect</Title>
-        <Description>Connect extension with your LOBSTR Wallet</Description>
+        <Title>Connect your wallet</Title>
+        <Description>
+          Connect your Stellar wallet from the LOBSTR app to the signer
+          extension
+          <br />
+          Allow the signer extension to connect your wallet from the LOBSTR app
+        </Description>
         <Instruction>
-          1. Open <Highlighted>LOBSTR Wallet</Highlighted> app on your phone
+          1. Open the <Highlighted>LOBSTR wallet</Highlighted> app on your phone
         </Instruction>
         <Instruction>
           2. Tap{" "}
           <Highlighted>
             Scan <img src={QR} alt="QR" />
-          </Highlighted>
+          </Highlighted>{" "}
+          and scan the QR code below
         </Instruction>
+        <Instruction>3. Confirm the connection on your phone</Instruction>
         <QrContainer className="test_wrapper">
           <QRCode
             value={`lobstr-extension://${applicationId}/${uuid}`}
@@ -170,7 +177,7 @@ const Connect = () => {
       <DontHaveLobstr onClick={() => setShowLinks(true)}>
         <img src={Logo} alt="Logo" />
         <DontHaveLobstrText>
-          Don’t have the LOBSTR mobile app?{" "}
+          Don’t have the LOBSTR mobile app installed?{" "}
         </DontHaveLobstrText>
         <Arrow src={ArrowIcon} alt=">" />
         {showLinks && (
@@ -180,14 +187,14 @@ const Connect = () => {
               target="_blank"
             >
               <img src={Ios} alt="Ios" />
-              <span>LOBSTR for iOS</span>
+              <span>Download LOBSTR app for iOS</span>
             </LobstrLink>
             <LobstrLink
               href="https://play.google.com/store/apps/details?id=com.lobstr.client&hl=en_US"
               target="_blank"
             >
               <img src={Android} alt="Android" />
-              <span>LOBSTR for Android</span>
+              <span>Download LOBSTR app for Android</span>
             </LobstrLink>
           </LobstrLinks>
         )}

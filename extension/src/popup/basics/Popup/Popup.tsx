@@ -11,7 +11,7 @@ interface PopupProps {
 }
 
 const Container = styled.div`
-  height: 100%;
+  height: 100vh;
   background-color: ${COLORS.white};
   max-height: ${POPUP_HEIGHT}px;
   min-height: ${POPUP_HEIGHT}px;
