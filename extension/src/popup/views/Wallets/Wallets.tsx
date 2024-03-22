@@ -151,7 +151,7 @@ const Wallets = () => {
         <AddAccount>
           <span>Connect additional wallets here</span>
           <AddAccountButton onClick={() => navigateTo(ROUTES.connect)}>
-            Connect Wallet
+            Add Wallet
           </AddAccountButton>
         </AddAccount>
       </Wrapper>

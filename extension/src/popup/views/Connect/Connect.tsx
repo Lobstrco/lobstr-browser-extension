@@ -33,6 +33,7 @@ import BackIcon from "popup/assets/icon-back.svg";
 const Wrapper = styled.div`
   ${WrapperStyles};
   padding-bottom: 0;
+  flex: 1;
 `;
 
 const Title = styled.h3`
@@ -62,7 +63,7 @@ const Highlighted = styled.div`
 `;
 
 const QrContainer = styled.div`
-  margin: 1.6rem auto;
+  margin: auto;
 `;
 
 const DontHaveLobstr = styled.div`
@@ -152,8 +153,6 @@ const Connect = () => {
         <Description>
           Connect your Stellar wallet from the LOBSTR app to the signer
           extension
-          <br />
-          Allow the signer extension to connect your wallet from the LOBSTR app
         </Description>
         <Instruction>
           1. Open the <Highlighted>LOBSTR wallet</Highlighted> app on your phone
@@ -165,7 +164,9 @@ const Connect = () => {
           </Highlighted>{" "}
           and scan the QR code below
         </Instruction>
-        <Instruction>3. Confirm the connection on your phone</Instruction>
+        <Instruction>
+          3. <Highlighted>Confirm</Highlighted> the connection request
+        </Instruction>
         <QrContainer className="test_wrapper">
           <QRCode
             value={`lobstr-extension://${applicationId}/${uuid}`}

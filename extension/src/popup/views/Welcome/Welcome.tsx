@@ -42,7 +42,9 @@ const Welcome = () => (
       <Title>Welcome to LOBSTR extension</Title>
       <Description>
         Securely connect to decentralized services on the Stellar network and
-        sign transactions with your LOBSTR wallet.
+        sign transactions
+        <br />
+        with your LOBSTR wallet.
       </Description>
       <Button fullWidth onClick={() => navigateTo(ROUTES.connect)}>
         Get Started

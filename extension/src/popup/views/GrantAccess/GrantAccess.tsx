@@ -183,7 +183,7 @@ const GrantAccess = () => {
       <ListHeader>
         <span>Choose a wallet to use with this website</span>
         <AddAccountButton onClick={() => navigateTo(ROUTES.connect)}>
-          Connect Wallet
+          Add Wallet
         </AddAccountButton>
       </ListHeader>
       <Wrapper>

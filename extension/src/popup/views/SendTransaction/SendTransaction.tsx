@@ -143,7 +143,9 @@ const SendTransaction = () => {
 
         <Title>Continue in LOBSTR app</Title>
         <Description>
-          We've sent a signature request to the LOBSTR app on your phone.
+          We've sent a signature request
+          <br />
+          to the LOBSTR app on your phone.
           <br />
           Review the details and confirm to sign the transaction.
         </Description>

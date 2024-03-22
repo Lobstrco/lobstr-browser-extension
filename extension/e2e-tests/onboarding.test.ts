@@ -8,7 +8,7 @@ test("Welcome page loads", async ({ page }) => {
   await expect(page.getByText("Welcome to LOBSTR extension")).toBeVisible();
   await expect(
     page.getByText(
-      "Securely connect to decentralized services on the Stellar network and sign transactions with your LOBSTR wallet.",
+      "Securely connect to decentralized services on the Stellar network and sign transactions",
     ),
   ).toBeVisible();
   await expect(page).toHaveScreenshot("welcome-page.png");
