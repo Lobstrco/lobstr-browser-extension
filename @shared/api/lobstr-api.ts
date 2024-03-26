@@ -4,7 +4,7 @@ import { GetConnectionResponse } from "@shared/constants/types";
 import { TX_STATUS } from "@shared/constants/services";
 import { deleteRequest, get, post } from "./helpers/request";
 
-const API_URL = "https://staging.lobstr.co";
+const API_URL = "https://lobstr.co";
 
 const LOGIN_POLLING_INTERVAL = 5000;
 const LOGIN_POLLING_ATTEMPTS = 60; // 5 minutes
