@@ -61,7 +61,7 @@ This function is useful for determining if a user in your application has LOBSTR
 import { isConnected } from "@lobstr/extension-api";
 
 if (await isConnected()) {
-  alert("User has LOBSTR!");
+  alert("User has LOBSTR extension installed!");
 }
 ```
 
@@ -144,6 +144,6 @@ For example:
 
 ```javascript
 if (await window.lobstrSignerExtensionApi.isConnected()) {
-  alert("User has LOBSTR!");
+  alert("User has LOBSTR extension installed!");
 }
 ```
