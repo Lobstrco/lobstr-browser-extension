@@ -35,7 +35,7 @@ To install on Firefox:
 2. Click `Load Temporary Add-On`
 
 3. Navigate to this folder and open the `build` folder and find `manifest.json`.
-   Hit `Select`. You should now see an icon for Freighter in Firefox
+   Hit `Select`. You should now see an icon for LOBSTR in Firefox
 
 ## Project Setup
 
