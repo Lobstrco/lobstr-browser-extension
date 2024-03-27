@@ -1,4 +1,4 @@
-import * as publicInterface from "@lobstr/extension-api";
+import * as publicInterface from "@lobstrco/signer-extension-api";
 
 describe.each(Object.keys(publicInterface.default))("%s", (fn) => {
   test("exits gracefully in node", async () => {

@@ -1,4 +1,4 @@
-# @lobstr/extension-api
+# @lobstrco/signer-extension-api
 
 This packages builds a wrapper around the messaging system used to interact with
 the LOBSTR web extension. Client applications will be able to install this package
@@ -13,20 +13,20 @@ You'll want a local version of the extension to test with.
 - Head over to the Chrome extension store and install LOBSTR into your browser.
 
 ### Install LOBSTR API
-Now we need a way to communicate with the extension. To facilitate this, we create a Javascript library called **@lobstr/extension-api** that will let you send and receives messages from the extension.
+Now we need a way to communicate with the extension. To facilitate this, we create a Javascript library called **@lobstrco/signer-extension-api** that will let you send and receives messages from the extension.
 
 #### For ES2023 applications
-- Install the module using npm: ```npm install @lobstr/extension-api```
+- Install the module using npm: ```npm install @lobstrco/signer-extension-api```
 
 or
 
-- Install the module using yarn: ```yarn add @lobstr/extension-api```
+- Install the module using yarn: ```yarn add @lobstrco/signer-extension-api```
 
 #### For browser-based applications
 Install the packaged library via script tag using cdnjs, swapping in the desired version number for ```{version}```:
 
 ```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lobstr-extension-api/{version}/index.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lobstrco-signer-extension-api/{version}/index.min.js"></script>
 ```
 
 ## Using LOBSTR in a web app
@@ -36,7 +36,7 @@ We now have an extension installed on our machine and a library to interact with
 First import the whole library in an ES2023 application
 
 ```javascript
-import lobstrApi from "@lobstr/extension-api";
+import lobstrApi from "@lobstrco/signer-extension-api";
 ```
 
 or import just the modules you require:
@@ -46,7 +46,7 @@ import {
  isConnected,
  getPublicKey,
  signTransaction,
-} from "@lobstr/extension-api";
+} from "@lobstrco/signer-extension-api";
 ```
 
 Now let's dig into what functionality is available to you:
@@ -58,7 +58,7 @@ Now let's dig into what functionality is available to you:
 This function is useful for determining if a user in your application has LOBSTR installed.
 
 ```javascript
-import { isConnected } from "@lobstr/extension-api";
+import { isConnected } from "@lobstrco/signer-extension-api";
 
 if (await isConnected()) {
   alert("User has LOBSTR extension installed!");
@@ -72,7 +72,7 @@ if (await isConnected()) {
 If LOBSTR is connected, LOBSTR will simply return the public key. If either one of the above is not true, it will return an empty string.
 
 ```typescript
-import { getPublicKey } from "@lobstr/extension-api";
+import { getPublicKey } from "@lobstrco/signer-extension-api";
 
 const retrievePublicKey = async (): Promise<string> => {
   let publicKey = "";
@@ -102,7 +102,7 @@ This function accepts a transaction XDR string, which it will decode, sign as th
 
 
 ```typescript
-import { signTransaction } from "@lobstr/extension-api";
+import { signTransaction } from "@lobstrco/signer-extension-api";
 
 const userSignTransaction = async (xdr: string): Promise<string> => {
   let signedTransaction = "";
@@ -132,7 +132,7 @@ First import the library in the ```<head>``` tag of your page.
 
 ```html
 <head>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/lobstr-extension-api/{version}/index.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lobstrco-signer-extension-api/{version}/index.min.js"></script>
 </head>
 ```
 

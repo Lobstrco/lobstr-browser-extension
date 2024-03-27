@@ -30,7 +30,7 @@ export const sendMessageToContentScript = (msg: Msg): Promise<any> => {
 
     /*
       In the case that LOBSTR is not installed at all, any messages to
-      background from @lobstr/extension-api will hang forever and not respond in any way.
+      background from @lobstrco/signer-extension-api will hang forever and not respond in any way.
       This is especially a problem for the isConnected method, because this is
       likely to be called in a situation where LOBSTR isn't installed.
       To prevent this, we add a timeout to automatically resolve in the event

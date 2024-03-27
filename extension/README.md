@@ -65,7 +65,7 @@ of these are located in the `src/` folder:
 
 3. The `content script` that allows external sites to send and receive messages
    to `background`. Using an event listener, it waits for an application to
-   attempt to communicate using `@lobstr/extension-api`(under the hood,
+   attempt to communicate using `@lobstrco/signer-extension-api`(under the hood,
    `window.postMessage`). Once it picks up a message and determines that this
    from `extension-api`, it sends the message onto `background`.
 

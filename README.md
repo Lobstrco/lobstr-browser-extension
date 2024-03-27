@@ -3,7 +3,7 @@
 This repo is constructed using yarn workspaces and consists of the 3 sections:
 
 - the browser extension (`/extension`)
-- the client-facing SDK (`/@lobstr/extension-api`)
+- the client-facing SDK (`/@lobstrco/signer-extension-api`)
 - some shared files that the above use (`/@shared/*`)
 
 ## Prerequisites
@@ -38,7 +38,7 @@ yarn start
 
 This will start up multiple watching builds in parallel:
 
-- The `@lobstr/extension-api` npm module
+- The `@lobstrco/signer-extension-api` npm module
 - A dev server with the webapp running in the extension, serving on
   `localhost:9000`
 - The actual built extension, able to be installed in Chrome, in `build/`
@@ -55,7 +55,7 @@ These can be started individually with `yarn start:\<workspace name\>` where
 yarn build
 ```
 
-This will produce final output for the `@lobstr/extension-api` npm module, and
+This will produce final output for the `@lobstrco/signer-extension-api` npm module, and
 the extension.
 
 `yarn build:\<workspace name\>`, like the equivalent start commands, will build

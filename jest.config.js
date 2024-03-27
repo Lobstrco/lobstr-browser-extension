@@ -1,6 +1,11 @@
 const jsdomTests = {
   rootDir: __dirname,
-  roots: ["./", "./extension", "./@shared/api", "./@lobstr/extension-api"],
+  roots: [
+    "./",
+    "./extension",
+    "./@shared/api",
+    "./@lobstrco/signer-extension-api",
+  ],
   collectCoverageFrom: ["src/**/*.{ts,tsx,mjs}"],
   setupFiles: [
     "<rootDir>/config/jest/jest.polyfills.js",

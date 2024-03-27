@@ -8,7 +8,7 @@
     "@shared/constants",
     "@shared/api",
     "extension",
-    "@lobstr/extension-api"
+    "@lobstrco/signer-extension-api"
   ],
   "scripts": {
     "setup": "yarn install",
@@ -16,11 +16,11 @@
     "install:extension": "cd extension && yarn install",
     "install:shared-constants": "cd @shared/constants && yarn install",
     "install:shared-api": "cd @shared/api && yarn install",
-    "install:api": "cd @lobstr/extension-api && yarn install",
+    "install:api": "cd @lobstrco/signer-extension-api && yarn install",
     "postinstall": "run-p install:*",
     "build:extension": "yarn workspace extension build",
     "start:extension": "yarn workspace extension start",
-    "start:extension-api": "yarn workspace @lobstr/extension-api start",
+    "start:extension-api": "yarn workspace @lobstrco/signer-extension-api start",
     "start:unpacked": "yarn workspace extension start:unpacked-extension",
     "start": "run-p --print-label start:extension-api start:extension start:unpacked",
     "test:ci": "jest --ci",
