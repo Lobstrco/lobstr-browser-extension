@@ -1,19 +1,17 @@
 # @lobstrco/signer-extension-api
 
-This packages builds a wrapper around the messaging system used to interact with
-the LOBSTR web extension. Client applications will be able to install this package
-from npm and then integrate with LOBSTR using dev-friendly methods.
+This packages builds a wrapper around the messaging system used to interact with the LOBSTR browser extension. Client applications will be able to install this package from npm and then integrate with the LOBSTR signer extension using dev-friendly methods.
 
 ## Getting Started
-To get started, you'll need both the LOBSTR extension and the API needed to integrate with it.
+To get started, you’ll need both the LOBSTR signer extension and the API needed to integrate with it.
 
-### Install the LOBSTR extension.
-You'll want a local version of the extension to test with.
+### Install the LOBSTR signer extension.
+You’ll require a local version of the extension to test.
 
-- Head over to the Chrome extension store and install LOBSTR into your browser.
+- Head over to the Chrome Web Store and install LOBSTR signer extension into your browser.
 
-### Install LOBSTR API
-Now we need a way to communicate with the extension. To facilitate this, we create a Javascript library called **@lobstrco/signer-extension-api** that will let you send and receives messages from the extension.
+### Install LOBSTR signer extension API
+Now, you need a way to communicate with the LOBSTR signer extension. To facilitate this, we created a Javascript library called **@lobstrco/signer-extension-api** that will let you send and receive messages from the extension.
 
 #### For ES2023 applications
 - Install the module using npm: ```npm install @lobstrco/signer-extension-api```
@@ -29,8 +27,8 @@ Install the packaged library via script tag using cdnjs, swapping in the desired
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lobstrco-signer-extension-api/{version}/index.min.js"></script>
 ```
 
-## Using LOBSTR in a web app
-We now have an extension installed on our machine and a library to interact with it. This library will provide you methods to send and receive data from a user's extension in your website or application.
+## Using LOBSTR signer extension in a web app
+You now have an extension installed on your machine and a library to interact with it. This library will provide methods to send and receive data from a user’s extension on your website or application.
 
 ### Importing
 First import the whole library in an ES2023 application
@@ -55,7 +53,7 @@ Now let's dig into what functionality is available to you:
 
 ```isConnected() -> <Promise<boolean>>```
 
-This function is useful for determining if a user in your application has LOBSTR installed.
+This function is used to determine whether a user has the LOBSTR signer extension installed in your application.
 
 ```javascript
 import { isConnected } from "@lobstrco/signer-extension-api";
@@ -69,7 +67,7 @@ if (await isConnected()) {
 
 ```getPublicKey() -> <Promise<string>>```
 
-If LOBSTR is connected, LOBSTR will simply return the public key. If either one of the above is not true, it will return an empty string.
+If the LOBSTR wallet app is installed, the LOBSTR signer extension will simply return the public key. If either of the above is not true, it will return an empty string.
 
 ```typescript
 import { getPublicKey } from "@lobstrco/signer-extension-api";
@@ -123,7 +121,7 @@ const userSignTransaction = async (xdr: string): Promise<string> => {
 ```
 
 ## Using LOBSTR in the browser
-We now have an extension installed on our machine and a library to interact with it. This library will provide you methods to send and receive data from a user's extension in your website or application.
+You now have the LOBSTR signer extension installed on our machine and a library to interact with it. This library will provide you methods to send and receive data from a user’s extension in your website or application.
 
 ### Importing
 First import the library in the ```<head>``` tag of your page.
