@@ -1,4 +1,8 @@
-# LOBSTR browser extension
+# LOBSTR | Signer extension
+
+LOBSTR signer extension allows you to securely connect to decentralized services on the Stellar network and sign transactions with your LOBSTR wallet mobile app.
+
+## Yarn Workspaces
 
 This repo is constructed using yarn workspaces and consists of the 3 sections:
 
