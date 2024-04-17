@@ -4,7 +4,7 @@ LOBSTR signer extension allows you to securely connect to decentralized services
 
 ## Developers: Integrating with LOBSTR signer extension
 
-To implement authorization via LOBSTR signer extension, use package [@lobstrco/signer-extension-api](./@lobstrco/signer-extension-api)
+To add the “Login with LOBSTR wallet” option to your project, use the [@lobstrco/signer-extension-api](./@lobstrco/signer-extension-api) package.
 
 ## Yarn Workspaces
 
