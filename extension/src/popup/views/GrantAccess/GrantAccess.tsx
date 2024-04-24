@@ -64,6 +64,7 @@ const Domain = styled.span`
   width: 100%;
   ${DescriptionStyles};
   ${TextEllipsis};
+  text-align: center;
 `;
 
 const ListHeader = styled.div`

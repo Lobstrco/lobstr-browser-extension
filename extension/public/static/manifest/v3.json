@@ -1,7 +1,7 @@
 {
   "name": "LOBSTR | Signer extension",
-  "version": "1.0.0",
-  "version_name": "1.0.0",
+  "version": "1.0.1",
+  "version_name": "1.0.1",
   "description": "LOBSTR signer extension allows you to use your Stellar wallet in LOBSTR to securely interact with dApps built on Stellar.",
   "background": {
     "service_worker": "background.min.js"
