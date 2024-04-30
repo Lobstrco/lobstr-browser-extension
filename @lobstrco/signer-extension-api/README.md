@@ -1,6 +1,10 @@
 # @lobstrco/signer-extension-api
 
-This packages builds a wrapper around the messaging system used to interact with the LOBSTR browser extension. Client applications will be able to install this package from npm and then integrate with the LOBSTR signer extension using dev-friendly methods.
+This package builds a wrapper around the messaging system used to interact with the LOBSTR browser extension. Client applications will be able to install this package from npm and then integrate it with the LOBSTR signer extension using dev-friendly methods.
+
+## User Interface Guideline
+
+To ensure consistency of styles with the LOBSTR wallet, please use the assets in [this folder](../../extension/public/static/images) for your integration and always write the **LOBSTR** wallet brand name in all capital letters only.
 
 ## Getting Started
 To get started, you’ll need both the LOBSTR signer extension and the API needed to integrate with it.
@@ -8,7 +12,7 @@ To get started, you’ll need both the LOBSTR signer extension and the API neede
 ### Install the LOBSTR signer extension.
 You’ll require a local version of the extension to test.
 
-- Head over to the Chrome Web Store and install LOBSTR signer extension into your browser.
+- Head over to the Chrome Web Store and install the LOBSTR signer extension into your browser.
 
 ### Install LOBSTR signer extension API
 Now, you need a way to communicate with the LOBSTR signer extension. To facilitate this, we created a Javascript library called **@lobstrco/signer-extension-api** that will let you send and receive messages from the extension.

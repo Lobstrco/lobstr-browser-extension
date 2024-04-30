@@ -2,7 +2,7 @@
 
 LOBSTR signer extension allows you to securely connect to decentralized services on the Stellar network and sign transactions with your LOBSTR wallet mobile app.
 
-To integrate the LOBSTR signer extension into your project and add the 'Log in with LOBSTR wallet' option, use the package [@lobstrco/signer-extension-api](./@lobstrco/signer-extension-api).
+To integrate the LOBSTR signer extension into your project and add the 'Log in with LOBSTR wallet' option, use the package [@lobstrco/signer-extension-api](./@lobstrco/signer-extension-api) and [UI resources](./extension/public/static/images).
 
 
 ## Yarn Workspaces
