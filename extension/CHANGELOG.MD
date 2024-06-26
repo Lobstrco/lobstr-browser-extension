@@ -10,3 +10,7 @@
 # v1.0.2
 
 - Change the extension name in the manifest
+
+# v1.1.0
+
+- Add a new home page with account balances.
