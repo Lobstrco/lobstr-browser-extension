@@ -4,4 +4,5 @@ export enum ROUTES {
   wallets = "/wallets",
   grantAccess = "/grant-access",
   sendTransaction = "/send-transaction",
+  home = "/home",
 }

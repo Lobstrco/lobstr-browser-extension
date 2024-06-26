@@ -5,12 +5,16 @@ const initialState = {
   allAccounts: [] as Account[],
   isStorageChecked: false,
   applicationId: "",
+  selectedConnection: "",
+  isHiddenMode: false,
 };
 
 interface UiData {
   allAccounts: Account[];
   isStorageChecked: boolean;
   applicationId: string;
+  selectedConnection: string;
+  isHiddenMode: boolean;
 }
 
 export const sessionSlice = createSlice({
@@ -24,22 +28,52 @@ export const sessionSlice = createSlice({
     }),
     loadSavedState: (
       state,
-      action: { payload: { allAccounts: Account[]; applicationId: string } },
+      action: {
+        payload: {
+          allAccounts: Account[];
+          applicationId: string;
+          selectedConnection: string;
+          isHiddenMode: boolean;
+        };
+      },
     ) => {
-      const { allAccounts = [], applicationId = "" } = action.payload;
+      const {
+        allAccounts = [],
+        applicationId = "",
+        selectedConnection = "",
+        isHiddenMode = true,
+      } = action.payload;
 
       return {
         ...state,
         allAccounts,
         applicationId,
+        selectedConnection,
+        isHiddenMode,
       };
     },
-    logIn: (state, action: { payload: { allAccounts: Account[] } }) => {
+    logIn: (
+      state,
+      action: {
+        payload: { allAccounts: Account[] };
+      },
+    ) => {
       const { allAccounts = [] } = action.payload;
 
       return {
         ...state,
         allAccounts,
+      };
+    },
+    selectConnection: (
+      state,
+      action: { payload: { selectedConnection: string } },
+    ) => {
+      const { selectedConnection = "" } = action.payload;
+
+      return {
+        ...state,
+        selectedConnection,
       };
     },
     logOut: (state, action: { payload: { allAccounts: Account[] } }) => {
@@ -50,13 +84,25 @@ export const sessionSlice = createSlice({
         allAccounts,
       };
     },
+    toggleHiddenMode: (state) => ({
+      ...state,
+      isHiddenMode: !state.isHiddenMode,
+    }),
   },
 });
 
 export const sessionSelector = (state: { session: UiData }) => state.session;
 
 export const {
-  actions: { reset, logIn, logOut, setStorageChecked, loadSavedState },
+  actions: {
+    reset,
+    logIn,
+    logOut,
+    setStorageChecked,
+    selectConnection,
+    loadSavedState,
+    toggleHiddenMode,
+  },
 } = sessionSlice;
 
 export const allAccountsSelector = createSelector(
@@ -72,4 +118,14 @@ export const isStorageCheckedSelector = createSelector(
 export const applicationIdSelector = createSelector(
   sessionSelector,
   (session) => session.applicationId,
+);
+
+export const selectedConnectionSelector = createSelector(
+  sessionSelector,
+  (session) => session.selectedConnection,
+);
+
+export const isHiddenModeSelector = createSelector(
+  sessionSelector,
+  (session) => session.isHiddenMode,
 );

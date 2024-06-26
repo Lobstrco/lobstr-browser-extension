@@ -3,6 +3,7 @@ export const COLORS = {
   white: "#ffffff",
   hover: "#F3F7F8",
   border: "#E7F0F2",
+  tooltipBorder: "#E1EEEE",
   lightGray: "#AEB4C0",
   darkGray: "#1F4B65",
   grayActive: "#DAEBEE",

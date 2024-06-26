@@ -1,15 +1,18 @@
 import * as React from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import { useCallback, useEffect, useRef, useState } from "react";
 import Popup from "../../basics/Popup/Popup";
 import {
   DescriptionStyles,
-  FlexAllCenter,
   TitleStyles,
   WrapperStyles,
 } from "../../styles/common";
-import { allAccountsSelector, logout } from "../../ducks/authService";
+import {
+  allAccountsSelector,
+  logout,
+  selectConnection,
+} from "../../ducks/authService";
 
 import { COLORS } from "../../styles/colors";
 import { ROUTES } from "../../constants/routes";
@@ -19,6 +22,8 @@ import { Menu, MenuItem, MenuItemLink } from "../../basics/Menu/Menu";
 import useOnClickOutside from "../../helpers/useOutsideClick";
 import { AppDispatch } from "../../App";
 import { List } from "../../basics/List/List";
+import IconButton from "../../basics/IconButton/IconButton";
+import BackIcon from "../../assets/icon-back.svg";
 import Dots from "popup/assets/icon-three-dots.svg";
 
 const Wrapper = styled.div`
@@ -44,19 +49,8 @@ const Header = styled.div`
   margin-bottom: 2.4rem;
 `;
 
-const WalletButton = styled.div`
-  ${FlexAllCenter};
-  padding: 0.5rem;
-  cursor: pointer;
-  border-radius: 0.3rem;
-
-  &:hover {
-    background-color: ${COLORS.hover};
-  }
-`;
-
 const WalletsList = styled(List)`
-  max-height: 24rem;
+  max-height: 22rem;
 `;
 
 const Wallet = styled.div`
@@ -86,6 +80,21 @@ const StyledMenu = styled(Menu)`
   top: 0;
 `;
 
+const AccountViewStyled = styled(AccountView)`
+  cursor: pointer;
+  &:hover {
+    background-color: ${COLORS.hover};
+  }
+`;
+
+const BackButton = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  margin-bottom: 2.4rem;
+`;
+
 const Wallets = () => {
   const [menuKey, setMenuKey] = useState<string | null>(null);
   const allAccounts = useSelector(allAccountsSelector);
@@ -108,9 +117,17 @@ const Wallets = () => {
     [dispatch],
   );
 
+  const chooseCurrentWallet = (key: string) => {
+    dispatch(selectConnection(key)).finally(() => navigateTo(ROUTES.home));
+  };
+
   return (
     <Popup>
       <Wrapper>
+        <BackButton onClick={() => navigateTo(ROUTES.home)}>
+          <img src={BackIcon} alt="back" />
+          <span>Back</span>
+        </BackButton>
         <Header>
           <div>
             <Title>Connected wallets</Title>
@@ -123,14 +140,15 @@ const Wallets = () => {
           {allAccounts.map(
             ({ publicKey, federation, connectionKey, userAgent }) => (
               <Wallet key={connectionKey}>
-                <AccountView
+                <AccountViewStyled
                   publicKey={publicKey}
                   federation={federation}
                   userAgent={userAgent}
+                  onClick={() => chooseCurrentWallet(connectionKey)}
                 />
-                <WalletButton onClick={() => setMenuKey(connectionKey)}>
+                <IconButton onClick={() => setMenuKey(connectionKey)}>
                   <img src={Dots} alt="..." />
-                </WalletButton>
+                </IconButton>
                 {menuKey === connectionKey && (
                   <StyledMenu ref={ref}>
                     <MenuItem onClick={() => disconnect(connectionKey)}>

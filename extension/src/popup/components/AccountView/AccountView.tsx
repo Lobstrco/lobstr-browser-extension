@@ -5,10 +5,11 @@ import { truncatedPublicKey } from "../../helpers/stellar";
 import { COLORS } from "../../styles/colors";
 import { DescriptionStyles, TextEllipsis } from "../../styles/common";
 
-interface AccountViewProps {
+interface AccountViewProps extends React.HTMLAttributes<HTMLDivElement> {
   publicKey: string;
   federation: string;
   userAgent: string;
+  isNarrow?: boolean;
 }
 
 const Container = styled.div`
@@ -16,7 +17,7 @@ const Container = styled.div`
   gap: 1.2rem;
 `;
 
-const Details = styled.div`
+const Details = styled.div<{ $isNarrow?: boolean }>`
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -24,7 +25,7 @@ const Details = styled.div`
 
   span {
     ${TextEllipsis};
-    width: 20.8rem;
+    width: ${({ $isNarrow }) => ($isNarrow ? "15rem" : "20.8rem")};
   }
 
   span:first-child {
@@ -36,13 +37,15 @@ const AccountView = ({
   publicKey,
   federation,
   userAgent,
+  isNarrow,
+  ...props
 }: AccountViewProps) => {
   const truncated = truncatedPublicKey(publicKey);
 
   return (
-    <Container>
+    <Container {...props}>
       <IdentIcon publicKey={publicKey} />
-      <Details>
+      <Details $isNarrow={isNarrow}>
         <span>{federation || truncated}</span>
         <span>{userAgent}</span>
       </Details>

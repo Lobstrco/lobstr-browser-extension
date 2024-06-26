@@ -1,6 +1,10 @@
 // import { Account } from "@shared/constants/types";
 
-import { GetConnectionResponse } from "@shared/constants/types";
+import {
+  Account,
+  GetConnectionResponse,
+  LumenQuote,
+} from "@shared/constants/types";
 import { TX_STATUS } from "@shared/constants/services";
 import { deleteRequest, get, post } from "./helpers/request";
 
@@ -11,10 +15,28 @@ const LOGIN_POLLING_ATTEMPTS = 60; // 5 minutes
 
 let timeout: any;
 
-export const checkConnection = (uuid: string): Promise<boolean> =>
+export const updateConnection = (
+  uuid: string,
+): Promise<Partial<Account> | null> =>
   get(`${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`)
-    .then(() => true)
-    .catch(() => false);
+    .then((res) => {
+      const {
+        connection_key,
+        public_key,
+        federation_address,
+        user_agent,
+        currency,
+      } = res;
+
+      return {
+        publicKey: public_key,
+        connectionKey: connection_key,
+        federation: federation_address,
+        userAgent: user_agent,
+        currency,
+      };
+    })
+    .catch(() => null);
 
 export const checkLogin = (
   uuid: string,
@@ -30,8 +52,13 @@ export const checkLogin = (
   }
   return get(`${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`)
     .then((data: GetConnectionResponse) => {
-      const { connection_key, public_key, federation_address, user_agent } =
-        data;
+      const {
+        connection_key,
+        public_key,
+        federation_address,
+        user_agent,
+        currency,
+      } = data;
 
       return resolver
         ? resolver({
@@ -40,13 +67,15 @@ export const checkLogin = (
             federation: federation_address,
             userAgent: user_agent,
             lastActivityTime: Date.now(),
+            currency,
           })
         : {
-            public: public_key,
+            publicKey: public_key,
             connectionKey: connection_key,
             federation: federation_address,
             userAgent: user_agent,
             lastActivityTime: Date.now(),
+            currency,
           };
     })
     .catch(() => {
@@ -142,3 +171,6 @@ const checkTxStatus = (
       }),
     );
   });
+
+export const getLastLumenQuotes = (): Promise<LumenQuote[]> =>
+  get(`${API_URL}/api/latest-lumen-quotes/`);

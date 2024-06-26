@@ -13,6 +13,7 @@
     "@reduxjs/toolkit": "^2.1.0",
     "@shared/api": "1.0.0",
     "@shared/constants": "1.0.0",
+    "@stellar/stellar-sdk": "^12.1.0",
     "@types/chrome": "^0.0.259",
     "@types/node": "^20.11.10",
     "@types/react-dom": "^18.2.18",

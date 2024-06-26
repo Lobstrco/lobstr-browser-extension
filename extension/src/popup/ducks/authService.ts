@@ -9,6 +9,8 @@ import {
   loadState as loadStateService,
   login as loginService,
   logout as logoutService,
+  selectConnection as selectConnectionService,
+  toggleHiddenMode as toggleHiddenModeService,
 } from "@shared/api/internal";
 import { Account, ErrorMessage } from "@shared/constants/types";
 
@@ -17,6 +19,8 @@ interface InitialState {
   applicationState: APPLICATION_STATES;
   applicationId: string;
   error: string;
+  selectedConnection: string;
+  isHiddenMode: boolean;
 }
 
 const initialState: InitialState = {
@@ -24,6 +28,8 @@ const initialState: InitialState = {
   applicationId: "",
   applicationState: APPLICATION_STATES.APPLICATION_LOADING,
   error: "",
+  selectedConnection: "",
+  isHiddenMode: false,
 };
 
 export const loadState = createAsyncThunk<
@@ -31,6 +37,8 @@ export const loadState = createAsyncThunk<
     allAccounts: Account[];
     applicationId: string;
     applicationState: APPLICATION_STATES;
+    selectedConnection: string;
+    isHiddenMode: boolean;
   },
   void,
   { rejectValue: ErrorMessage }
@@ -46,7 +54,7 @@ export const loadState = createAsyncThunk<
 });
 
 export const login = createAsyncThunk<
-  { allAccounts: Account[]; error: string },
+  { allAccounts: Account[]; error: string; selectedConnection: string },
   string,
   { rejectValue: ErrorMessage }
 >("login", async (uuid: string, thunkApi) => {
@@ -65,14 +73,46 @@ export const login = createAsyncThunk<
   return res;
 });
 
+export const selectConnection = createAsyncThunk<
+  { selectedConnection: string },
+  string,
+  { rejectValue: ErrorMessage }
+>("selectAccount", async (connectionKey: string, thunkApi) => {
+  let res;
+  try {
+    res = await selectConnectionService(connectionKey);
+  } catch (e: any) {
+    console.error(e);
+    return thunkApi.rejectWithValue({ errorMessage: e.message });
+  }
+
+  return res;
+});
+
 export const logout = createAsyncThunk<
-  { allAccounts: Account[] },
+  { allAccounts: Account[]; selectedConnection: string },
   string,
   { rejectValue: ErrorMessage }
 >("logout", async (connectionKey: string, thunkApi) => {
   let res;
   try {
     res = await logoutService(connectionKey);
+  } catch (e: any) {
+    console.error(e);
+    return thunkApi.rejectWithValue({ errorMessage: e.message });
+  }
+
+  return res;
+});
+
+export const toggleHiddenMode = createAsyncThunk<
+  { isHiddenMode: boolean },
+  void,
+  { rejectValue: ErrorMessage }
+>("toggleHiddenMode", async (_, thunkApi) => {
+  let res;
+  try {
+    res = await toggleHiddenModeService();
   } catch (e: any) {
     console.error(e);
     return thunkApi.rejectWithValue({ errorMessage: e.message });
@@ -91,12 +131,15 @@ const authSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder.addCase(loadState.fulfilled, (state, action) => {
-      const { allAccounts, applicationId } = action.payload;
+      const { allAccounts, applicationId, selectedConnection, isHiddenMode } =
+        action.payload;
 
       return {
         ...state,
         allAccounts,
         applicationId,
+        selectedConnection,
+        isHiddenMode,
         applicationState: allAccounts.length
           ? APPLICATION_STATES.APPLICATION_LOGGED
           : APPLICATION_STATES.APPLICATION_STARTED,
@@ -112,12 +155,13 @@ const authSlice = createSlice({
       };
     });
     builder.addCase(login.fulfilled, (state, action) => {
-      const { allAccounts } = action.payload;
+      const { allAccounts, selectedConnection } = action.payload;
 
       return {
         ...state,
         error: "",
         allAccounts,
+        selectedConnection,
         applicationState: APPLICATION_STATES.APPLICATION_LOGGED,
       };
     });
@@ -129,19 +173,52 @@ const authSlice = createSlice({
         error: errorMessage,
       };
     });
+    builder.addCase(selectConnection.fulfilled, (state, action) => {
+      const { selectedConnection } = action.payload;
+
+      return {
+        ...state,
+        selectedConnection,
+      };
+    });
+    builder.addCase(selectConnection.rejected, (state, action) => {
+      const { errorMessage } = action.payload || { errorMessage: "" };
+
+      return {
+        ...state,
+        error: errorMessage,
+      };
+    });
     builder.addCase(logout.fulfilled, (state, action) => {
-      const { allAccounts } = action.payload;
+      const { allAccounts, selectedConnection } = action.payload;
 
       return {
         ...state,
         error: "",
         allAccounts,
+        selectedConnection,
         applicationState: allAccounts.length
           ? APPLICATION_STATES.APPLICATION_LOGGED
           : APPLICATION_STATES.APPLICATION_STARTED,
       };
     });
     builder.addCase(logout.rejected, (state, action) => {
+      const { errorMessage } = action.payload || { errorMessage: "" };
+
+      return {
+        ...state,
+        error: errorMessage,
+      };
+    });
+    builder.addCase(toggleHiddenMode.fulfilled, (state, action) => {
+      const { isHiddenMode } = action.payload;
+
+      return {
+        ...state,
+        isHiddenMode,
+      };
+    });
+    builder.addCase(toggleHiddenMode.rejected, (state, action) => {
       const { errorMessage } = action.payload || { errorMessage: "" };
 
       return {
@@ -159,6 +236,16 @@ const authSelector = (state: { auth: InitialState }) => state.auth;
 export const allAccountsSelector = createSelector(
   authSelector,
   (state: InitialState) => state.allAccounts,
+);
+
+export const selectedConnectionSelector = createSelector(
+  authSelector,
+  (state: InitialState) => state.selectedConnection,
+);
+
+export const isHiddenModeSelector = createSelector(
+  authSelector,
+  (state: InitialState) => state.isHiddenMode,
 );
 export const applicationStateSelector = createSelector(
   authSelector,

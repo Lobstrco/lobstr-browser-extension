@@ -1,13 +1,24 @@
-import { Account } from "@shared/constants/types";
+import {
+  Account,
+  Asset,
+  AssetSimple,
+  LumenQuote,
+  NativePrice,
+} from "@shared/constants/types";
 import { APPLICATION_STATES } from "@shared/constants/applicationState";
+import { getAssetString } from "extension/src/background/helpers/stellar";
+import { ASSETS_URL, NATIVE_PRICES_URL } from "@shared/constants/stellar";
 import { SERVICE_TYPES } from "../constants/services";
 
 import { sendMessageToBackground } from "./helpers/extensionMessaging";
+import { get, post } from "./helpers/request";
 
 export const loadState = (): Promise<{
   allAccounts: Account[];
   applicationState: APPLICATION_STATES;
   applicationId: string;
+  selectedConnection: string;
+  isHiddenMode: boolean;
 }> =>
   sendMessageToBackground({
     type: SERVICE_TYPES.LOAD_STATE,
@@ -15,15 +26,36 @@ export const loadState = (): Promise<{
 
 export const login = (
   uuid: string,
-): Promise<{ allAccounts: Account[]; error: string }> =>
+): Promise<{
+  allAccounts: Account[];
+  error: string;
+  selectedConnection: string;
+}> =>
   sendMessageToBackground({
     uuid,
     type: SERVICE_TYPES.LOGIN,
   });
 
+export const selectConnection = (
+  connectionKey: string,
+): Promise<{
+  selectedConnection: string;
+}> =>
+  sendMessageToBackground({
+    connectionKey,
+    type: SERVICE_TYPES.SELECT_CONNECTION,
+  });
+
+export const toggleHiddenMode = (): Promise<{
+  isHiddenMode: boolean;
+}> =>
+  sendMessageToBackground({
+    type: SERVICE_TYPES.TOGGLE_HIDDEN_MODE,
+  });
+
 export const logout = (
   connectionKey: string,
-): Promise<{ allAccounts: Account[] }> =>
+): Promise<{ allAccounts: Account[]; selectedConnection: string }> =>
   sendMessageToBackground({
     connectionKey,
     type: SERVICE_TYPES.LOGOUT,
@@ -81,3 +113,45 @@ export const rejectTransaction = async (): Promise<void> => {
     console.error(e);
   }
 };
+
+export const loadCachedAssets = (): Promise<{
+  assets: Asset[];
+}> =>
+  sendMessageToBackground({
+    type: SERVICE_TYPES.LOAD_CACHED_ASSETS,
+  });
+
+export const processNewAssets = (
+  assets: AssetSimple[],
+): Promise<{
+  assets: Asset[];
+}> =>
+  sendMessageToBackground({
+    type: SERVICE_TYPES.PROCESS_NEW_ASSETS,
+    assets,
+  });
+
+export const getAssetsInfo = (assets: AssetSimple[]): Promise<Asset[]> => {
+  const params = new URLSearchParams();
+
+  assets.forEach((asset) => {
+    params.append("asset", `${asset.code}:${asset.issuer}`);
+  });
+
+  return get(`${ASSETS_URL}?${params.toString()}`).then((data) => data.results);
+};
+
+export const getAssetsNativePrices = (
+  assets: AssetSimple[],
+): Promise<NativePrice[]> => {
+  const params = assets.map((asset) => getAssetString(asset));
+
+  const body = JSON.stringify({ asset_keys: params });
+
+  return post(NATIVE_PRICES_URL, { body }).then(({ results }) => results);
+};
+
+export const getLumenQuotes = (): Promise<{ quotes: LumenQuote[] }> =>
+  sendMessageToBackground({
+    type: SERVICE_TYPES.GET_LUMEN_QUOTES,
+  });

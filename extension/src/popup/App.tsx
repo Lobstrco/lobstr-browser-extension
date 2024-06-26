@@ -7,9 +7,11 @@ import { Router } from "./Router";
 import AppGlobalStyles from "./styles/AppGlobalStyles";
 import Loading from "./components/Loading/Loading";
 import { reducer as auth } from "popup/ducks/authService";
+import { reducer as assets } from "popup/ducks/assets";
 
 const rootReducer = combineReducers({
   auth,
+  assets,
 });
 export type AppState = ReturnType<typeof rootReducer>;
 export const store = configureStore({

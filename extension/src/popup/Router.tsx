@@ -18,6 +18,8 @@ import Loading from "./components/Loading/Loading";
 import Wallets from "./views/Wallets/Wallets";
 import GrantAccess from "./views/GrantAccess/GrantAccess";
 import SendTransaction from "./views/SendTransaction/SendTransaction";
+import Home from "./views/Home/Home";
+import { loadCachedAssetsInfo } from "./ducks/assets";
 import { ROUTES } from "popup/constants/routes";
 import { navigate } from "popup/ducks/views";
 
@@ -37,7 +39,7 @@ export const AuthRoute = ({
   }
 
   if (appState === APPLICATION_STATES.APPLICATION_LOGGED) {
-    return <Navigate to={ROUTES.wallets} />;
+    return <Navigate to={ROUTES.home} />;
   }
 
   return children;
@@ -61,6 +63,7 @@ export const Router = () => {
 
   useEffect(() => {
     dispatch(loadState());
+    dispatch(loadCachedAssetsInfo());
   }, [dispatch]);
 
   const appState = useSelector(applicationStateSelector);
@@ -82,6 +85,7 @@ export const Router = () => {
           }
         />
         <Route path={ROUTES.connect} element={<Connect />} />
+        <Route path={ROUTES.home} element={<Home />} />
         <Route path={ROUTES.wallets} element={<Wallets />} />
         <Route path={ROUTES.grantAccess} element={<GrantAccess />} />
         <Route path={ROUTES.sendTransaction} element={<SendTransaction />} />
