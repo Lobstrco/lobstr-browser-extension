@@ -1,57 +1,31 @@
 import browser from "webextension-polyfill";
+import { Storage } from "webextension-polyfill/namespaces/storage";
 
-interface SetItemParams {
-  [key: string]: any;
+export class BrowserStorage {
+  constructor(private readonly storage: Storage.StorageArea | Storage.LocalStorageArea) {}
+
+  async getItem(key: string): Promise<any> {
+    const storageResult = await this.storage.get(key);
+    const value: unknown = storageResult[key];
+    if (typeof value !== 'string') {
+      return value;
+    }
+    try {
+      return JSON.parse(value);
+    } catch (e) {
+      return value;
+    }
+  }
+
+  async setItem(keyId: string, value: any): Promise<void> {
+    await this.storage.set({ [keyId]: JSON.stringify(value) });
+  }
+
+  async clear(): Promise<void> {
+    await this.storage.clear();
+  }
 }
 
-// https://github.com/mozilla/webextension-polyfill/issues/424
-interface BrowserStorage extends browser.Storage.Static {
-  session: browser.Storage.LocalStorageArea;
-}
+export const LocalStorage: BrowserStorage = new BrowserStorage(browser.storage.local);
+// export const SessionStorage: BrowserStorage = new BrowserStorage(browser.storage.session);
 
-const storage = browser.storage as BrowserStorage;
-
-// browser storage uses local storage which stores values on disk and persists data across sessions
-// session storage uses session storage which stores data in memory and clears data after every "session"
-// only use session storage for secrets or sensitive values
-export const browserLocalStorage = storage?.local;
-export const browserSessionStorage = storage?.session;
-
-// Session Storage Feature Flag - turn on when storage.session is supported
-export const SESSION_STORAGE_ENABLED = false;
-
-export type StorageOption =
-  | typeof browserLocalStorage
-  | typeof browserSessionStorage;
-
-export const dataStorage = (
-  storageApi: StorageOption = browserLocalStorage,
-) => ({
-  getItem: async (key: string) => {
-    // TODO: re-enable defaults by passing an object. The value of the key-value pair will be the default
-
-    const storageResult = await storageApi.get(key);
-
-    return storageResult[key];
-  },
-  setItem: async (setItemParams: SetItemParams) => {
-    await storageApi.set(setItemParams);
-  },
-
-  clear: async () => {
-    await storageApi.clear();
-  },
-});
-
-export const dataStorageAccess = (
-  storageApi: StorageOption = browserLocalStorage,
-) => {
-  const store = dataStorage(storageApi);
-  return {
-    getItem: store.getItem,
-    setItem: async (keyId: string, value: any) => {
-      await store.setItem({ [keyId]: value });
-    },
-    clear: () => store.clear(),
-  };
-};

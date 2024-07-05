@@ -9,8 +9,8 @@ import {
   getUrlHostname,
 } from "../../helpers/urls";
 import { ROUTES } from "../../popup/constants/routes";
-import { browserLocalStorage, dataStorageAccess } from "../helpers/dataStorage";
 import { ALLOWLIST_ID } from "../../constants/localStorageTypes";
+import { LocalStorage } from "../helpers/dataStorage";
 import { responseQueue, transactionQueue } from "./popupMessageListener";
 import { MessageResponder } from "background/types";
 
@@ -21,7 +21,6 @@ import {
   POPUP_WIDTH,
 } from "background/constants/dimensions";
 
-const localStore = dataStorageAccess(browserLocalStorage);
 
 interface WINDOW_PARAMS {
   type: "popup";
@@ -96,7 +95,7 @@ export const signerExtensionApiMessageListener = (
     const domain = getUrlHostname(tabUrl);
     const punycodedDomain = getPunycodedDomain(domain);
 
-    const allowListStr = (await localStore.getItem(ALLOWLIST_ID)) || "";
+    const allowListStr = (await LocalStorage.getItem(ALLOWLIST_ID)) || "";
     const allowList = allowListStr.split(",");
     const isDomainListedAllowed = await isSenderAllowed({ sender });
 
@@ -135,7 +134,7 @@ export const signerExtensionApiMessageListener = (
         if (signedTransaction) {
           if (!isDomainListedAllowed) {
             allowList.push(punycodedDomain);
-            localStore.setItem(ALLOWLIST_ID, allowList.join());
+            LocalStorage.setItem(ALLOWLIST_ID, allowList.join());
           }
           if ((signedTransaction as { error: string }).error) {
             return resolve({

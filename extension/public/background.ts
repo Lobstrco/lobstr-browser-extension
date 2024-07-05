@@ -4,13 +4,8 @@ import {
   initInstalledListener,
 } from "background/index";
 
-import { buildStore } from "background/store";
+import { store } from "background/store";
 
-async function main() {
-  const store = await buildStore();
-  initContentScriptMessageListener();
-  initExtensionMessageListener(store);
-  initInstalledListener();
-}
-
-main();
+initContentScriptMessageListener();
+initExtensionMessageListener(store);
+initInstalledListener();
