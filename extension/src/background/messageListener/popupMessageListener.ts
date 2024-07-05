@@ -25,14 +25,10 @@ import {
   saveSelectedConnection,
 } from "../helpers/account";
 import { getAssetString } from "../helpers/stellar";
+import { LocalStorage } from "../helpers/dataStorage";
 import { MessageResponder } from "background/types";
 
 import { ALLOWLIST_ID } from "constants/localStorageTypes";
-
-import {
-  browserLocalStorage,
-  dataStorageAccess,
-} from "background/helpers/dataStorage";
 
 import {
   allAccountsSelector,
@@ -56,8 +52,6 @@ export const transactionQueue: Array<{
 }> = [];
 
 export const popupMessageListener = (request: Request, sessionStore: Store) => {
-  const localStore = dataStorageAccess(browserLocalStorage);
-
   const grantAccess = async () => {
     const { url = "", publicKey = "", connectionKey = "" } = request;
     const sanitizedUrl = getUrlHostname(url);
@@ -66,11 +60,11 @@ export const popupMessageListener = (request: Request, sessionStore: Store) => {
     // TODO: right now we're just grabbing the last thing in the queue, but this should be smarter.
     // Maybe we need to search through responses to find a matching response :thinking_face
     const response = responseQueue.pop();
-    const allowListStr = (await localStore.getItem(ALLOWLIST_ID)) || "";
+    const allowListStr = (await LocalStorage.getItem(ALLOWLIST_ID)) || "";
     const allowList = allowListStr.split(",");
     allowList.push(punycodedDomain);
 
-    await localStore.setItem(ALLOWLIST_ID, allowList.join());
+    await LocalStorage.setItem(ALLOWLIST_ID, allowList.join());
 
     if (typeof response === "function") {
       return response({ url, publicKey, connectionKey });
