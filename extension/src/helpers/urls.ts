@@ -7,11 +7,8 @@ export interface Params {
   connectionKey?: string;
 }
 
-export const encodeObject = (obj: {}) =>
-  btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
-
-export const decodeString = (str: string) =>
-  decodeURIComponent(escape(atob(str)));
+export const encodeObject = (obj: {}) => btoa(JSON.stringify(obj));
+export const decodeString = (str: string) => atob(str);
 
 export const newTabHref = (path = "", queryParams = "") =>
   `index.html#${path}${queryParams ? "?" : ""}${queryParams}`;

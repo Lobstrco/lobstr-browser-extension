@@ -66,7 +66,6 @@ module.exports = {
     "arrow-body-style": 1,
     "prefer-const": 1,
     "import/first": 1,
-    "import/order": 1,
     "object-shorthand": 1,
     "react/no-access-state-in-setstate": 1,
     "require-await": 1,
