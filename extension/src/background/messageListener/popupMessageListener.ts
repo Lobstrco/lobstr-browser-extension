@@ -11,7 +11,6 @@ import {
   updateConnection,
 } from "@shared/api/lobstr-api";
 import { getAssetsInfo } from "@shared/api/internal";
-import { getPunycodedDomain, getUrlHostname } from "../../helpers/urls";
 import {
   getAllAccounts,
   getApplicationId,
@@ -25,10 +24,8 @@ import {
   saveSelectedConnection,
 } from "../helpers/account";
 import { getAssetString } from "../helpers/stellar";
-import { LocalStorage } from "../helpers/dataStorage";
+import { AllowedSenders } from "../helpers/allowListAuthorization";
 import { MessageResponder } from "background/types";
-
-import { ALLOWLIST_ID } from "constants/localStorageTypes";
 
 import {
   allAccountsSelector,
@@ -54,17 +51,11 @@ export const transactionQueue: Array<{
 export const popupMessageListener = (request: Request, sessionStore: Store) => {
   const grantAccess = async () => {
     const { url = "", publicKey = "", connectionKey = "" } = request;
-    const sanitizedUrl = getUrlHostname(url);
-    const punycodedDomain = getPunycodedDomain(sanitizedUrl);
+    await AllowedSenders.addToList(url);
 
     // TODO: right now we're just grabbing the last thing in the queue, but this should be smarter.
     // Maybe we need to search through responses to find a matching response :thinking_face
     const response = responseQueue.pop();
-    const allowListStr = (await LocalStorage.getItem(ALLOWLIST_ID)) || "";
-    const allowList = allowListStr.split(",");
-    allowList.push(punycodedDomain);
-
-    await LocalStorage.setItem(ALLOWLIST_ID, allowList.join());
 
     if (typeof response === "function") {
       return response({ url, publicKey, connectionKey });

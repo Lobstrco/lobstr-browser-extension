@@ -2,15 +2,9 @@ import browser from "webextension-polyfill";
 
 import { ExternalRequestTx } from "@shared/constants/types";
 import { EXTERNAL_SERVICE_TYPES } from "@shared/constants/services";
-import { isSenderAllowed } from "../helpers/allowListAuthorization";
-import {
-  encodeObject,
-  getPunycodedDomain,
-  getUrlHostname,
-} from "../../helpers/urls";
+import { AllowedSenders } from "../helpers/allowListAuthorization";
+import { encodeObject, getUrlHostname } from "../../helpers/urls";
 import { ROUTES } from "../../popup/constants/routes";
-import { ALLOWLIST_ID } from "../../constants/localStorageTypes";
-import { LocalStorage } from "../helpers/dataStorage";
 import { responseQueue, transactionQueue } from "./popupMessageListener";
 import { MessageResponder } from "background/types";
 
@@ -93,11 +87,7 @@ export const signerExtensionApiMessageListener = (
 
     const { url: tabUrl = "" } = sender;
     const domain = getUrlHostname(tabUrl);
-    const punycodedDomain = getPunycodedDomain(domain);
 
-    const allowListStr = (await LocalStorage.getItem(ALLOWLIST_ID)) || "";
-    const allowList = allowListStr.split(",");
-    const isDomainListedAllowed = await isSenderAllowed({ sender });
 
     if (!connectionKey) {
       return Promise.resolve({ error: "The connection key is missing" });
@@ -131,20 +121,15 @@ export const signerExtensionApiMessageListener = (
         });
       }
       const response = (signedTransaction: string | { error: string }) => {
-        if (signedTransaction) {
-          if (!isDomainListedAllowed) {
-            allowList.push(punycodedDomain);
-            LocalStorage.setItem(ALLOWLIST_ID, allowList.join());
-          }
-          if ((signedTransaction as { error: string }).error) {
-            return resolve({
-              error: (signedTransaction as { error: string }).error,
-            });
-          }
-          return resolve({ signedTransaction });
+        if (!signedTransaction) {
+          resolve({ error: "User declined access" });
+          return;
         }
 
-        resolve({ error: "User declined access" });
+        AllowedSenders.addToList(tabUrl);
+
+        const error: string | null = (signedTransaction as { error: string }).error || null;
+        return error ? resolve({ error }) : resolve({ signedTransaction });
       };
 
       responseQueue.push(response);
