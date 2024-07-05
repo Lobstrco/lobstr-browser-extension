@@ -25,8 +25,7 @@ export const parsedSearchParam = (param: string): Params => {
 
 export const getUrlHostname = (url: string) => {
   try {
-    const u = new URL(url);
-    return u.hostname;
+    return new URL(url).hostname;
   } catch {
     return "";
   }

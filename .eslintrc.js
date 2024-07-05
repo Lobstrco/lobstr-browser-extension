@@ -64,7 +64,6 @@ module.exports = {
     "react/prop-types": 1,
     "react/jsx-curly-brace-presence": 1,
     "arrow-body-style": 1,
-    "valid-jsdoc": [1],
     "prefer-const": 1,
     "import/first": 1,
     "import/order": 1,
