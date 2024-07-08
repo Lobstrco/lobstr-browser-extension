@@ -9,6 +9,7 @@ import { popupMessageListener } from "./messageListener/popupMessageListener";
 import { ROUTES } from "popup/constants/routes";
 import { PopupWindow } from "./helpers/popupWindow";
 import { externalApiMessageListener } from "./messageListener/externalApi";
+import { MessageError } from "./helpers/messageError";
 
 export const initContentScriptMessageListener = () => {
   browser?.runtime?.onMessage?.addListener((message) => {
@@ -25,7 +26,11 @@ export const initExtensionMessageListener = (sessionStore: Store) => {
     if (request.type in SERVICE_TYPES) {
       return popupMessageListener(request, sessionStore);
     } else if (request.type in EXTERNAL_SERVICE_TYPES) {
-      return externalApiMessageListener(request, sender);
+      return externalApiMessageListener(request, sender)
+          .catch((error: unknown) =>
+            error instanceof MessageError ?
+              Promise.resolve(error) :
+              Promise.reject(error));
     } else {
       return Promise.resolve();
     }

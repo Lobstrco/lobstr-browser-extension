@@ -15,7 +15,7 @@ export const newTabHref = (path = "", queryParams = "") =>
 
 export const removeQueryParam = (url = "") => url.replace(/\?(.*)/, "");
 
-export const parsedSearchParam = (param: string): Params => {
+export const parsedSearchParam = <T = Params>(param: string): T => {
   const decodedSearchParam = decodeString(param.replace("?", ""));
   return decodedSearchParam ? JSON.parse(decodedSearchParam) : {};
 };

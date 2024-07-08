@@ -12,6 +12,7 @@ import { SERVICE_TYPES } from "../constants/services";
 
 import { sendMessageToBackground } from "./helpers/extensionMessaging";
 import { get, post } from "./helpers/request";
+import { GrantAccessData, RequestWithOperation } from "../constants/mesagesData.types";
 
 export const loadState = (): Promise<{
   allAccounts: Account[];
@@ -63,9 +64,10 @@ export const logout = (
 
 // ACCESS
 
-export const rejectAccess = async (): Promise<void> => {
+export const rejectAccess = async (data: RequestWithOperation): Promise<void> => {
   try {
     await sendMessageToBackground({
+      data,
       type: SERVICE_TYPES.REJECT_ACCESS,
     });
   } catch (e) {
@@ -73,20 +75,10 @@ export const rejectAccess = async (): Promise<void> => {
   }
 };
 
-export const grantAccess = async ({
-  url,
-  publicKey,
-  connectionKey,
-}: {
-  url: string;
-  publicKey: string;
-  connectionKey: string;
-}): Promise<void> => {
+export const grantAccess = async (data: GrantAccessData): Promise<void> => {
   try {
     await sendMessageToBackground({
-      url,
-      publicKey,
-      connectionKey,
+      data,
       type: SERVICE_TYPES.GRANT_ACCESS,
     });
   } catch (e) {
@@ -94,9 +86,10 @@ export const grantAccess = async ({
   }
 };
 
-export const signTransaction = async (): Promise<void> => {
+export const signTransaction = async (data: RequestWithOperation): Promise<void> => {
   try {
     await sendMessageToBackground({
+      data,
       type: SERVICE_TYPES.SIGN_TRANSACTION,
     });
   } catch (e) {
@@ -104,9 +97,10 @@ export const signTransaction = async (): Promise<void> => {
   }
 };
 
-export const rejectTransaction = async (): Promise<void> => {
+export const rejectTransaction = async (data: RequestWithOperation): Promise<void> => {
   try {
     await sendMessageToBackground({
+      data,
       type: SERVICE_TYPES.REJECT_TRANSACTION,
     });
   } catch (e) {
