@@ -4,6 +4,7 @@ import { signWithLobstr } from "@shared/api/lobstr-api";
 import { allAccountsSelector, logIn } from "../../ducks/session";
 import { saveAllAccounts } from "../../helpers/account";
 import { store } from "../../store";
+import { MessageError } from "../../helpers/messageError";
 
 export async function signTransaction(data: RequestWithOperation) {
     const { operationId } = data;
@@ -29,7 +30,8 @@ export async function signTransaction(data: RequestWithOperation) {
         );
         operation.resolve({ signedTransaction });
     } catch (e) {
-        operation.reject({ error: "Sign failed" });
+        const message: string = typeof e === 'string' ? e : 'Sign failed';
+        operation.reject(new MessageError(message));
     }
 }
 

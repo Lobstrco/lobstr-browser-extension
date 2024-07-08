@@ -111,7 +111,7 @@ export const signWithLobstr = (
   )
     .then((res) => res.id)
     .then((id) => checkTxStatus(uuid, id))
-    .catch((e) => ({ error: e }));
+    .then((xdr) => xdr ? xdr : Promise.reject('User declined access'));
 };
 
 const PollingMap = new Map<
