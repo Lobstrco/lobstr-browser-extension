@@ -4,8 +4,6 @@ import {
   initInstalledListener,
 } from "background/index";
 
-import { store } from "background/store";
-
 initContentScriptMessageListener();
-initExtensionMessageListener(store);
+initExtensionMessageListener();
 initInstalledListener();

@@ -1,15 +1,14 @@
 import browser from "webextension-polyfill";
-import { Store } from "redux";
 import {
   EXTERNAL_SERVICE_TYPES,
   SERVICE_TYPES,
 } from "@shared/constants/services";
 
-import { popupMessageListener } from "./messageListener/popupMessageListener";
 import { ROUTES } from "popup/constants/routes";
 import { PopupWindow } from "./helpers/popupWindow";
 import { externalApiMessageListener } from "./messageListener/external";
 import { MessageError } from "./helpers/messageError";
+import { internalMessagesListener } from "./messageListener/internal";
 
 export const initContentScriptMessageListener = () => {
   browser?.runtime?.onMessage?.addListener((message) => {
@@ -21,10 +20,10 @@ export const initContentScriptMessageListener = () => {
   });
 };
 
-export const initExtensionMessageListener = (sessionStore: Store) => {
+export const initExtensionMessageListener = () => {
   browser?.runtime?.onMessage?.addListener((request, sender) => {
     if (request.type in SERVICE_TYPES) {
-      return popupMessageListener(request, sessionStore);
+      return internalMessagesListener(request);
     } else if (request.type in EXTERNAL_SERVICE_TYPES) {
       return externalApiMessageListener(request, sender)
           .catch((error: unknown) =>
