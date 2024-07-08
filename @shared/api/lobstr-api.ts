@@ -17,7 +17,7 @@ let timeout: any;
 
 export const updateConnection = (
   uuid: string,
-): Promise<Partial<Account> | null> =>
+): Promise<Omit<Account, 'lastActivityTime'> | null> =>
   get(`${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`)
     .then((res) => {
       const {
