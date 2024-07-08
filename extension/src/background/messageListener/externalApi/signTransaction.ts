@@ -1,45 +1,31 @@
 import browser from "webextension-polyfill";
 import { ExternalRequestTx } from "@shared/constants/types";
 import { getUrlHostname } from "../../../helpers/urls";
-import { responseQueue, transactionQueue } from "../popupMessageListener";
 
 import { ROUTES } from "../../../popup/constants/routes";
 import { AllowedSenders } from "../../helpers/allowListAuthorization";
 import { PopupWindow } from "background/helpers/popupWindow";
+import { AsyncOperationsStore } from "../../helpers/asyncOperations";
+import { MessageError } from "../../helpers/messageError";
+import { RequestSignAdditional, SignRequestResolve } from "@shared/constants/mesagesData.types";
 
 export function signTransaction(
     request: ExternalRequestTx,
-    sender: browser.Runtime.MessageSender
+    { url = "" }: browser.Runtime.MessageSender
 ): Promise<unknown> {
-    const { transactionXdr, connectionKey } = request;
-
-    const { url: tabUrl = "" } = sender;
-    const domain = getUrlHostname(tabUrl);
-
-
-    if (!connectionKey) {
-        return Promise.resolve({ error: "The connection key is missing" });
-    }
-
-    transactionQueue.push({ transactionXdr, connectionKey, domain });
-
-    return new Promise((resolve) => {
-        new PopupWindow(ROUTES.sendTransaction, { connectionKey })
-            .onUnableToOpen(() => resolve({ error: "Couldn't open access prompt" }))
-            .onRemoved(() => resolve({ error: "User declined access" }));
-
-        const response = (signedTransaction: string | { error: string }) => {
-            if (!signedTransaction) {
-                resolve({ error: "User declined access" });
-                return;
+    return AsyncOperationsStore
+        .create<SignRequestResolve, RequestSignAdditional>()
+        .syncEffect((operation) => {
+            const { transactionXdr, connectionKey } = request;
+            if (!connectionKey) {
+                return operation.reject(new MessageError("The connection key is missing"));
             }
-
-            AllowedSenders.addToList(tabUrl);
-
-            const error: string | null = (signedTransaction as { error: string }).error || null;
-            return error ? resolve({ error }) : resolve({ signedTransaction });
-        };
-
-        responseQueue.push(response);
-    });
+            const domain = getUrlHostname(url);
+            operation.setAdditionalData({ transactionXdr, connectionKey, domain });
+            new PopupWindow(ROUTES.sendTransaction, { connectionKey, operationId: operation.id })
+                .onUnableToOpen(() => operation.reject(new MessageError("Couldn't open access prompt")))
+                .onRemoved(() => operation.reject(new MessageError("User declined access")));
+        })
+        .onResolve(() => AllowedSenders.addToList(url))
+        .promise;
 }

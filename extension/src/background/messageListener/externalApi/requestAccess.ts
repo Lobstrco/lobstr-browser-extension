@@ -1,28 +1,19 @@
 import browser from "webextension-polyfill";
 import { ROUTES } from "../../../popup/constants/routes";
-import { responseQueue } from "../popupMessageListener";
 import { PopupWindow } from "../../helpers/popupWindow";
+import { AsyncOperation, AsyncOperationsStore } from "../../helpers/asyncOperations";
+import { GrantAccessResolve, RequestAccessData } from "@shared/constants/mesagesData.types";
+import { MessageError } from "../../helpers/messageError";
 
 export function requestAccess(sender: browser.Runtime.MessageSender): Promise<unknown> {
-    const { tab, url: tabUrl = "" } = sender;
-
-    new PopupWindow(ROUTES.grantAccess, { tab, url: tabUrl });
-
-    return new Promise((resolve) => {
-        const response = ({ url, publicKey, connectionKey }: {
-            url?: string;
-            publicKey?: string;
-            connectionKey?: string;
-        }) => {
-            // queue it up, we'll let user confirm the url looks okay and then we'll send publicKey
-            // if we're good, of course
-            if (url === tabUrl) {
-                resolve({ publicKey, connectionKey });
-            }
-
-            resolve({ error: "User declined access" });
-        };
-
-        responseQueue.push(response);
-    });
+    // Create awaiting operation in store
+    return AsyncOperationsStore
+        .create<GrantAccessResolve, null>()
+        .syncEffect((operation: AsyncOperation<GrantAccessResolve>) => {
+            // open grantAccess popup
+            const data: RequestAccessData = { url: sender.url || "", operationId: operation.id };
+            new PopupWindow(ROUTES.grantAccess, data)
+                .onRemoved(() => operation.reject(new MessageError("User declined access" )));
+        })
+        .promise;
 }

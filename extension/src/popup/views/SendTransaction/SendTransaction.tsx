@@ -19,6 +19,7 @@ import { COLORS } from "../../styles/colors";
 import IdentIcon from "../../basics/Identicon/IdentIcon";
 import { truncatedPublicKey } from "../../helpers/stellar";
 import SignIcon from "popup/assets/sign.svg";
+import { RequestSignData } from "@shared/constants/mesagesData.types";
 
 const Wrapper = styled.div`
   ${WrapperStyles};
@@ -114,7 +115,7 @@ const SendTransaction = () => {
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { connectionKey } = parsedSearchParam(location.search);
+  const { connectionKey, operationId } = parsedSearchParam<RequestSignData>(location.search);
 
   const allAccounts = useSelector(allAccountsSelector);
 
@@ -124,14 +125,14 @@ const SendTransaction = () => {
   );
 
   const sign = useCallback(async () => {
-    await dispatch(signTransaction());
+    await dispatch(signTransaction({ operationId }));
     window.close();
-  }, [dispatch]);
+  }, [dispatch, operationId]);
 
   const reject = useCallback(async () => {
-    await dispatch(rejectTransaction());
+    await dispatch(rejectTransaction({ operationId }));
     window.close();
-  }, [dispatch]);
+  }, [dispatch, operationId]);
 
   useEffect(() => {
     if (!account) {

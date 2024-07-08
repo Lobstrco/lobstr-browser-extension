@@ -40,35 +40,35 @@ import {
   setStorageChecked,
   toggleHiddenMode,
 } from "background/ducks/session";
-
-export const responseQueue: Array<(message?: any) => void> = [];
-export const transactionQueue: Array<{
-  connectionKey: string;
-  transactionXdr: string;
-  domain: string;
-}> = [];
+import { AsyncOperation, AsyncOperationsStore } from "../helpers/asyncOperations";
+import {
+  GrantAccessResolve,
+  RequestSignAdditional,
+  SignRequestResolve
+} from "@shared/constants/mesagesData.types";
+import { MessageError } from "../helpers/messageError";
 
 export const popupMessageListener = (request: Request, sessionStore: Store) => {
   const grantAccess = async () => {
-    const { url = "", publicKey = "", connectionKey = "" } = request;
+    const { url, publicKey, connectionKey, operationId } = request.data;
     await AllowedSenders.addToList(url);
 
-    // TODO: right now we're just grabbing the last thing in the queue, but this should be smarter.
-    // Maybe we need to search through responses to find a matching response :thinking_face
-    const response = responseQueue.pop();
-
-    if (typeof response === "function") {
-      return response({ url, publicKey, connectionKey });
+    const operation: AsyncOperation<GrantAccessResolve> | null = AsyncOperationsStore.get(operationId);
+    if (!operation) {
+      console.error(`Missing operation for grantAccess with id ${operationId}`);
+      return;
     }
-
-    return { error: "Access was denied" };
+    operation.resolve({ publicKey, connectionKey });
   };
 
   const rejectAccess = () => {
-    const response = responseQueue.pop();
-    if (response) {
-      response();
+    const { operationId } = request.data;
+    const operation = AsyncOperationsStore.get(operationId);
+    if (!operation) {
+      console.error(`Missing operation for grantAccess with id ${operationId}`);
+      return;
     }
+    operation.reject(new MessageError("User declined access"));
   };
 
   const _updateConnections = (connections: Account[]): Promise<Account[]> =>
@@ -312,45 +312,42 @@ export const popupMessageListener = (request: Request, sessionStore: Store) => {
     };
   };
 
-  const signTransaction = async () => {
-    const { transactionXdr, connectionKey, domain } =
-      transactionQueue.pop() as {
-        connectionKey: string;
-        transactionXdr: string;
-        domain: string;
-      };
+  const signTransaction = async (): Promise<void> => {
+    const { operationId } = request.data;
+    const operation = AsyncOperationsStore.get<SignRequestResolve, RequestSignAdditional>(operationId);
+    if (!operation) {
+      console.error(`Missing operation for transactionSign with id ${operationId}`);
+      return;
+    }
+    const { transactionXdr, connectionKey, domain } = operation.getAdditionalData()!;
 
     if (!transactionXdr) {
-      return { error: "transactionXDR is not exists" };
+      operation.reject("transactionXDR is not exists");
+      return;
     }
 
     await _updateLastActivityTime(connectionKey);
 
-    const transactionResponse = responseQueue.pop();
-
     try {
-      const signedTx = await signWithLobstr(
+      const signedTransaction = await signWithLobstr(
         transactionXdr,
         connectionKey,
         domain,
       );
-      if (typeof transactionResponse === "function") {
-        return transactionResponse(signedTx);
-      }
+      operation.resolve({ signedTransaction });
     } catch (e) {
-      if (typeof transactionResponse === "function") {
-        return { error: "Sign failed" };
-      }
-      return { error: e };
+      operation.reject({ error: "Sign failed" });
     }
   };
 
   const rejectTransaction = () => {
-    transactionQueue.pop();
-    const transactionResponse = responseQueue.pop();
-    if (transactionResponse) {
-      transactionResponse({ error: "Associated account not found" });
+    const { operationId } = request.data;
+    const operation = AsyncOperationsStore.get(operationId);
+    if (!operation) {
+      console.error(`Missing operation for transactionSign with id ${operationId}`);
+      return;
     }
+    operation.reject("Associated account not found");
   };
 
   const loadCachedAssets = async () => {

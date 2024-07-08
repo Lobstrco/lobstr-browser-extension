@@ -12,6 +12,7 @@ export function externalApiMessageListener(
     switch (request.type) {
         case EXTERNAL_SERVICE_TYPES.REQUEST_ACCESS:
             return requestAccess(sender);
+        case EXTERNAL_SERVICE_TYPES.SUBMIT_TRANSACTION:
         case EXTERNAL_SERVICE_TYPES.SIGN_TRANSACTION:
             return signTransaction(request, sender);
         case EXTERNAL_SERVICE_TYPES.REQUEST_CONNECTION_STATUS:

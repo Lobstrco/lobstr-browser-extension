@@ -10,6 +10,7 @@ export interface Request {
   uuid: string;
   connectionKey: string;
   assets: AssetSimple[];
+  data: any;
 }
 
 export interface GetPublicKeyResponse {

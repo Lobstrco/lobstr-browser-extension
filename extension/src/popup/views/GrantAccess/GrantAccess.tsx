@@ -25,6 +25,7 @@ import { AppDispatch } from "../../App";
 import Lobstr from "popup/assets/lobstr-logo.svg";
 import CheckIcon from "popup/assets/icon-checked.svg";
 import { grantAccess, rejectAccess } from "popup/ducks/access";
+import { RequestAccessData } from "@shared/constants/mesagesData.types";
 
 const Wrapper = styled.div`
   ${WrapperStyles};
@@ -122,7 +123,7 @@ const GrantAccess = () => {
   const dispatch: AppDispatch = useDispatch();
   const allAccounts = useSelector(allAccountsSelector);
 
-  const { url } = parsedSearchParam(location.search);
+  const { url, operationId } = parsedSearchParam<RequestAccessData>(location.search);
 
   const domain = getUrlHostname(url);
   const favicon = getSiteFavicon(url);
@@ -146,8 +147,8 @@ const GrantAccess = () => {
     }
   }, [allAccounts]);
 
-  const rejectAndClose = () => {
-    dispatch(rejectAccess());
+  const rejectAndClose = async () => {
+    await dispatch(rejectAccess({ operationId }));
     window.close();
   };
 
@@ -159,7 +160,7 @@ const GrantAccess = () => {
       ({ connectionKey }) => connectionKey === selectedWalletKey,
     )!;
     await dispatch(
-      grantAccess({ url, publicKey, connectionKey: selectedWalletKey }),
+      grantAccess({ url, publicKey, connectionKey: selectedWalletKey, operationId }),
     );
     window.close();
   };
