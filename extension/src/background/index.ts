@@ -8,7 +8,7 @@ import {
 import { popupMessageListener } from "./messageListener/popupMessageListener";
 import { ROUTES } from "popup/constants/routes";
 import { PopupWindow } from "./helpers/popupWindow";
-import { externalApiMessageListener } from "./messageListener/externalApi";
+import { externalApiMessageListener } from "./messageListener/external";
 import { MessageError } from "./helpers/messageError";
 
 export const initContentScriptMessageListener = () => {
