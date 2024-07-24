@@ -5,15 +5,19 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { HORIZON_URL } from "@shared/constants/stellar";
 import { getAssetsNativePrices, getLumenQuotes } from "@shared/api/internal";
-import { LumenQuote, NativePrice } from "@shared/constants/types";
-import { TextEllipsis, WrapperStyles } from "../../styles/common";
+import {
+  BalanceAssetExtended,
+  BalanceNativeExtended,
+  LumenQuote,
+  NativePrice,
+} from "@shared/constants/types";
+import { WrapperStyles } from "../../styles/common";
 import Popup from "../../basics/Popup/Popup";
 import {
   allAccountsSelector,
   isHiddenModeSelector,
   logout,
   selectedConnectionSelector,
-  toggleHiddenMode,
 } from "../../ducks/authService";
 import { navigateTo } from "../../helpers/navigate";
 import { ROUTES } from "../../constants/routes";
@@ -27,13 +31,13 @@ import { processNew } from "../../ducks/assets";
 import Loading from "../../components/Loading/Loading";
 import Asset from "../../basics/Asset/Asset";
 import { List } from "../../basics/List/List";
-import { formatBalance, formatCurrencyBalance } from "../../helpers/format";
 import Tooltip, { TOOLTIP_POSITION } from "../../basics/Tooltip/Tooltip";
+import Balance from "../../components/Balance/Balance";
+import BalanceCurrency from "../../components/BalanceCurrency/BalanceCurrency";
+import TotalBalance from "../../components/TotalBalance/TotalBalance";
 import Copy from "popup/assets/icon-copy.svg";
 import Dots from "popup/assets/icon-three-dots.svg";
 import Down from "popup/assets/icon-arrow-down.svg";
-import Eye from "popup/assets/icon-eye.svg";
-import EyeCrossed from "popup/assets/icon-eye-crossed.svg";
 
 const Wrapper = styled.div`
   ${WrapperStyles};
@@ -42,13 +46,17 @@ const Wrapper = styled.div`
   flex-direction: column;
 `;
 
+const HeaderWrapper = styled(Wrapper)`
+  padding-right: 1.6rem;
+`;
+
 const Header = styled.div`
   display: flex;
-  gap: 0.8rem;
+  align-items: center;
   position: relative;
 `;
 
-const StyledIconButton = styled(IconButton)`
+const StyledTooltip = styled(Tooltip)`
   margin-left: auto;
 `;
 
@@ -69,45 +77,8 @@ const StyledMenu = styled(Menu)`
   top: 0;
 `;
 
-const TotalBalanceBlock = styled.div`
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  padding: 0.8rem 2.4rem 1.6rem;
-  border-bottom: 0.1rem solid ${COLORS.border};
-`;
-
-const TotalBalance = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 0.4rem;
-
-  span:first-child {
-    font-size: 2.1rem;
-    font-weight: 500;
-  }
-
-  span:last-child {
-    font-size: 1.2rem;
-    line-height: 1.8rem;
-    color: ${COLORS.lightGray};
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-  }
-`;
-
-const ToggleHiddenModeButton = styled.img`
-  cursor: pointer;
-`;
-
-const AddAccountButton = styled.div`
-  color: ${COLORS.blue};
-  cursor: pointer;
-`;
-
 const BalancesList = styled(List)`
-  max-height: 26rem;
+  max-height: 25rem;
 `;
 
 const BalanceRow = styled.div`
@@ -115,28 +86,12 @@ const BalanceRow = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 1.2rem 0;
+  gap: 4rem;
 `;
 
 const BalanceColumn = styled.div`
   display: flex;
   flex-direction: column;
-  width: 40%;
-`;
-
-const Balance = styled.span`
-  font-size: 1.3rem;
-  font-weight: 400;
-  line-height: 1.6rem;
-  text-align: right;
-  ${TextEllipsis};
-`;
-
-const BalanceCurrency = styled.span`
-  font-size: 1.2rem;
-  font-weight: 400;
-  line-height: 1.6rem;
-  color: ${COLORS.lightGray};
-  text-align: right;
 `;
 
 const Home = () => {
@@ -160,10 +115,6 @@ const Home = () => {
   const selectedConnection = useSelector(selectedConnectionSelector);
 
   const dispatch: AppDispatch = useDispatch();
-
-  const toggle = () => {
-    dispatch(toggleHiddenMode());
-  };
 
   useEffect(() => {
     if (!allAccounts.length) {
@@ -238,7 +189,7 @@ const Home = () => {
     [dispatch],
   );
 
-  const currentLumenQuote = useMemo(() => {
+  const currentLumenQuote: Pick<LumenQuote, "price"> | null = useMemo(() => {
     if (!lumenQuotes || !currentAccount) {
       return null;
     }
@@ -249,18 +200,11 @@ const Home = () => {
     }
     return lumenQuotes.find(
       (quote) => quote.currency === currentAccount?.currency.code,
-    );
+    ) as LumenQuote;
   }, [lumenQuotes, currentAccount]);
 
   const sortedBalances:
-    | (
-        | (StellarSdk.Horizon.HorizonApi.BalanceLineAsset & {
-            nativeBalance: number;
-          })
-        | (StellarSdk.Horizon.HorizonApi.BalanceLineNative & {
-            nativeBalance: number;
-          })
-      )[]
+    | (BalanceAssetExtended | BalanceNativeExtended)[]
     | null = useMemo(() => {
     if (!nativePrices || !balances) {
       return null;
@@ -279,12 +223,8 @@ const Home = () => {
       return { ...balance, nativeBalance: +balance.balance * nativePrice };
     });
     return [
-      native,
-      ...(
-        rest as (StellarSdk.Horizon.HorizonApi.BalanceLineAsset & {
-          nativeBalance: number;
-        })[]
-      ).sort(
+      native as BalanceNativeExtended,
+      ...(rest as BalanceAssetExtended[]).sort(
         (a, b) =>
           b.nativeBalance - a.nativeBalance ||
           +b.balance - +a.balance ||
@@ -292,16 +232,6 @@ const Home = () => {
       ),
     ];
   }, [nativePrices, balances]);
-
-  const totalBalance = useMemo(() => {
-    if (!sortedBalances) {
-      return 0;
-    }
-    return sortedBalances.reduce((acc, balance) => {
-      acc += balance.nativeBalance;
-      return acc;
-    }, 0);
-  }, [sortedBalances]);
 
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -319,7 +249,7 @@ const Home = () => {
 
   return (
     <Popup>
-      <Wrapper>
+      <HeaderWrapper>
         <Header>
           <HeaderButton onClick={() => navigateTo(ROUTES.wallets)}>
             <AccountView
@@ -331,27 +261,25 @@ const Home = () => {
             <img src={Down} alt="open wallets" />
           </HeaderButton>
 
-          <Tooltip
+          <StyledTooltip
             content={<span>Copied</span>}
             position={TOOLTIP_POSITION.bottom}
             isShow={isShowTooltip}
           >
-            <StyledIconButton
+            <IconButton
               onClick={() => copyToClipboard(currentAccount!.publicKey)}
             >
               <img src={Copy} alt="copy" />
-            </StyledIconButton>
-          </Tooltip>
+            </IconButton>
+          </StyledTooltip>
 
           <IconButton onClick={() => setIsMenuOpen(true)}>
             <img src={Dots} alt="..." />
           </IconButton>
           {isMenuOpen && (
             <StyledMenu ref={menuRef}>
-              <MenuItem
-                onClick={() => disconnect(currentAccount!.connectionKey)}
-              >
-                Remove connection
+              <MenuItem onClick={() => navigateTo(ROUTES.connect)}>
+                Add wallet
               </MenuItem>
               <MenuItemLink
                 target="_blank"
@@ -361,33 +289,21 @@ const Home = () => {
               >
                 View on Network Explorer
               </MenuItemLink>
+              <MenuItem
+                onClick={() => disconnect(currentAccount!.connectionKey)}
+              >
+                Remove connection
+              </MenuItem>
             </StyledMenu>
           )}
         </Header>
-      </Wrapper>
-      <TotalBalanceBlock>
-        <TotalBalance>
-          <span>
-            {isHiddenMode
-              ? "***"
-              : `${currentAccount.currency.symbol}${formatCurrencyBalance(
-                  totalBalance * currentLumenQuote.price,
-                  currentAccount.currency.display_decimals,
-                )}`}
-          </span>
-          <span>
-            Your total balance
-            <ToggleHiddenModeButton
-              src={isHiddenMode ? Eye : EyeCrossed}
-              alt="show"
-              onClick={() => toggle()}
-            />
-          </span>
-        </TotalBalance>
-        <AddAccountButton onClick={() => navigateTo(ROUTES.connect)}>
-          Add Wallet
-        </AddAccountButton>
-      </TotalBalanceBlock>
+      </HeaderWrapper>
+      <TotalBalance
+        sortedBalances={sortedBalances}
+        isHiddenMode={isHiddenMode}
+        currentAccount={currentAccount}
+        currentLumenQuote={currentLumenQuote}
+      />
       <Wrapper>
         <BalancesList $withScroll={Boolean(balances && balances?.length > 4)}>
           {sortedBalances?.map((balance) => (
@@ -409,25 +325,13 @@ const Home = () => {
                 }
               />
               <BalanceColumn>
-                {isHiddenMode ? (
-                  <BalanceCurrency>***</BalanceCurrency>
-                ) : (
-                  <>
-                    <Balance>
-                      {formatBalance(+balance.balance, true)}{" "}
-                      {balance.asset_type === "native"
-                        ? "XLM"
-                        : balance.asset_code}
-                    </Balance>
-                    <BalanceCurrency>
-                      {currentAccount.currency.symbol}
-                      {formatCurrencyBalance(
-                        +balance.nativeBalance * currentLumenQuote.price,
-                        currentAccount.currency.display_decimals,
-                      )}
-                    </BalanceCurrency>
-                  </>
-                )}
+                <Balance balance={balance} isHidden={isHiddenMode} />
+                <BalanceCurrency
+                  balance={balance}
+                  currentLumenQuote={currentLumenQuote}
+                  currentAccount={currentAccount}
+                  isHidden={isHiddenMode}
+                />
               </BalanceColumn>
             </BalanceRow>
           ))}

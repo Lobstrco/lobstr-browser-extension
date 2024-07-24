@@ -93,6 +93,7 @@ const BackButton = styled.div`
   gap: 0.4rem;
   cursor: pointer;
   margin-bottom: 2.4rem;
+  font-weight: 500;
 `;
 
 const Wallets = () => {

@@ -92,6 +92,7 @@ const AccountBlock = styled.div`
 
   span:first-child {
     color: ${COLORS.darkGray};
+    font-weight: 500;
   }
 `;
 

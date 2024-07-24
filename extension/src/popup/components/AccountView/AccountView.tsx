@@ -30,6 +30,7 @@ const Details = styled.div<{ $isNarrow?: boolean }>`
 
   span:first-child {
     color: ${COLORS.darkGray};
+    font-weight: 500;
   }
 `;
 

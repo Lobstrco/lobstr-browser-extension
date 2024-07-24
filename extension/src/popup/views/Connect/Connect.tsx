@@ -106,6 +106,7 @@ const BackButton = styled.div`
   align-items: center;
   gap: 0.4rem;
   cursor: pointer;
+  font-weight: 500;
 `;
 
 const Connect = () => {

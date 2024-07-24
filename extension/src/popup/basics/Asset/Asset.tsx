@@ -8,7 +8,7 @@ import { COLORS } from "../../styles/colors";
 const Container = styled.div`
   display: flex;
   align-items: center;
-  width: 60%;
+  min-width: 0;
 `;
 
 const AssetLogo = styled.img`
@@ -39,6 +39,7 @@ const Name = styled.span`
   font-weight: 400;
   line-height: 1.6rem;
   color: ${COLORS.darkGray};
+  ${TextEllipsis};
 `;
 
 const Domain = styled.span`
@@ -71,7 +72,7 @@ const Asset = ({ code, issuer }: AssetProps) => {
       <AssetMain>
         <Name>{assetInfo?.name || code}</Name>
         <Domain>
-          {code} ({assetInfo?.home_domain || "unknown"})
+          {code} {assetInfo?.home_domain ? `(${assetInfo?.home_domain})` : ""}
         </Domain>
       </AssetMain>
     </Container>

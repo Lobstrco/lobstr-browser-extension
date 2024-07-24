@@ -16,6 +16,7 @@ const ButtonBody = styled.button<{ $fullWidth?: boolean; $isCancel?: boolean }>`
     $isCancel ? COLORS.border : COLORS.green};
   color: ${({ $isCancel }) => ($isCancel ? COLORS.darkGray : COLORS.white)};
   cursor: pointer;
+  font-weight: 500;
 
   &:hover {
     background-color: ${({ $isCancel }) =>

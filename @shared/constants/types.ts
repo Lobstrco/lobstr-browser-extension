@@ -1,3 +1,4 @@
+import * as StellarSdk from "@stellar/stellar-sdk";
 import { EXTERNAL_SERVICE_TYPES, SERVICE_TYPES } from "./services";
 import { APPLICATION_STATES } from "./applicationState";
 
@@ -112,6 +113,16 @@ export interface LumenQuote {
   currency: string;
   price: number;
   percent_change_24h: number;
+}
+
+export interface BalanceAssetExtended
+  extends StellarSdk.Horizon.HorizonApi.BalanceLineAsset {
+  nativeBalance: number;
+}
+
+export interface BalanceNativeExtended
+  extends StellarSdk.Horizon.HorizonApi.BalanceLineNative {
+  nativeBalance: number;
 }
 
 declare global {

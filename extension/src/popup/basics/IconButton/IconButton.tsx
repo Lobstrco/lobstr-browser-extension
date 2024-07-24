@@ -8,6 +8,7 @@ const WalletButton = styled.div`
   padding: 0.5rem;
   cursor: pointer;
   border-radius: 0.3rem;
+  height: fit-content;
 
   &:hover {
     background-color: ${COLORS.hover};
