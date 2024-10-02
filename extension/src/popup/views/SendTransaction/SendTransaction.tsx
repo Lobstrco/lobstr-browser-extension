@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Popup from "../../basics/Popup/Popup";
 import {
   DescriptionStyles,
+  TextEllipsis,
   TitleStyles,
   WrapperStyles,
 } from "../../styles/common";
@@ -100,6 +101,12 @@ const AccountInfo = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 0.8rem;
+  width: 100%;
+
+  span {
+    width: 90%;
+    ${TextEllipsis};
+  }
 `;
 
 const SendTransaction = () => {
