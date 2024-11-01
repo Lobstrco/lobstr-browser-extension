@@ -233,8 +233,6 @@ const Home = () => {
     });
   };
 
-  console.log(currentAccount, sortedBalances, currentLumenQuote);
-
   if (!currentAccount || !sortedBalances || !currentLumenQuote!) {
     return <Loading />;
   }
