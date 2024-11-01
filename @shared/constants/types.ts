@@ -95,19 +95,33 @@ export interface Asset {
   name: string;
 }
 
-export type ListResponse<T> = {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: T[];
-};
+interface RateDetails {
+  code: string;
+  symbol: string;
+  display_decimals: number;
+  is_currency_first: boolean;
+  rate: number;
+}
 
-export interface NativePrice {
-  asset_code: string;
-  asset_issuer: string;
-  avg_native_price: string;
-  close_native_price: string;
-  open_native_price: string;
+interface LastNativeRate {
+  base_asset: string;
+  counter_asset: string;
+  base_amount: string;
+  counter_amount: string;
+  rate: number;
+  reverse_rate: number;
+  created_at: string;
+  updated_at: string;
+  added_at: string;
+  timestamp: number;
+}
+
+export interface AlternativeRatesResponse {
+  last_native_rate: LastNativeRate | null;
+  alternative_rate: RateDetails;
+  usd_rate: RateDetails;
+  code: string;
+  issuer: string;
 }
 
 export interface LumenQuote {

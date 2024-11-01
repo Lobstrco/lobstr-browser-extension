@@ -4,13 +4,8 @@ import * as StellarSdk from "@stellar/stellar-sdk";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { HORIZON_URL } from "@shared/constants/stellar";
-import { getAssetsNativePrices, getLumenQuotes } from "@shared/api/internal";
-import {
-  BalanceAssetExtended,
-  BalanceNativeExtended,
-  LumenQuote,
-  NativePrice,
-} from "@shared/constants/types";
+import { getLumenQuotes, getPricesCollection } from "@shared/api/internal";
+import { BalanceAssetExtended, BalanceNativeExtended, LumenQuote } from "@shared/constants/types";
 import { WrapperStyles } from "../../styles/common";
 import Popup from "../../basics/Popup/Popup";
 import {
@@ -105,7 +100,7 @@ const Home = () => {
     | null
   >(null);
 
-  const [nativePrices, setNativePrices] = useState<NativePrice[] | null>(null);
+  const [nativePrices, setNativePrices] = useState<Map<string, number> | null>(null);
   const [lumenQuotes, setLumenQuotes] = useState<LumenQuote[] | null>(null);
 
   const server = useMemo(() => new StellarSdk.Horizon.Server(HORIZON_URL), []);
@@ -156,7 +151,7 @@ const Home = () => {
               : new StellarSdk.Asset(balance.asset_code, balance.asset_issuer),
           );
           dispatch(processNew(newAssets));
-          getAssetsNativePrices(newAssets).then((result) => {
+          getPricesCollection(newAssets).then((result: Map<string, number>) => {
             setNativePrices(result);
           });
         },
@@ -169,7 +164,7 @@ const Home = () => {
               selling_liabilities: "0",
             },
           ]);
-          setNativePrices([]);
+          setNativePrices(new Map());
         },
       });
 
@@ -209,17 +204,12 @@ const Home = () => {
     if (!nativePrices || !balances) {
       return null;
     }
-    const [native, ...rest] = [...balances].reverse().map((balance) => {
+    const [native, ...rest] = [...balances].reverse().map((balance: any) => {
+      const assetKey: string = `${balance.asset_code}:${balance.asset_issuer}`;
       const nativePrice: number =
         balance.asset_type === "native"
           ? 1
-          : Number(
-              nativePrices.find(
-                (price) =>
-                  price.asset_code === balance.asset_code &&
-                  price.asset_issuer === balance.asset_issuer,
-              )?.close_native_price ?? 0,
-            );
+          : nativePrices.get(assetKey) ?? 0;
       return { ...balance, nativeBalance: +balance.balance * nativePrice };
     });
     return [

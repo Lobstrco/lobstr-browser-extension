@@ -3,11 +3,11 @@ import {
   Asset,
   AssetSimple,
   LumenQuote,
-  NativePrice,
+  AlternativeRatesResponse
 } from "@shared/constants/types";
 import { APPLICATION_STATES } from "@shared/constants/applicationState";
 import { getAssetString } from "extension/src/background/helpers/stellar";
-import { ASSETS_URL, NATIVE_PRICES_URL } from "@shared/constants/stellar";
+import { ASSETS_URL, ALTERNATIVE_PRICES_URL } from "@shared/constants/stellar";
 import { SERVICE_TYPES } from "../constants/services";
 
 import { sendMessageToBackground } from "./helpers/extensionMessaging";
@@ -135,14 +135,32 @@ export const getAssetsInfo = (assets: AssetSimple[]): Promise<Asset[]> => {
   return get(`${ASSETS_URL}?${params.toString()}`).then((data) => data.results);
 };
 
-export const getAssetsNativePrices = (
-  assets: AssetSimple[],
-): Promise<NativePrice[]> => {
-  const params = assets.map((asset) => getAssetString(asset));
+export const getPricesCollection = async (
+    assets: AssetSimple[],
+): Promise<Map<string, number>> => {
+  const chunkSize: number = 100;
 
-  const body = JSON.stringify({ asset_keys: params });
+  // Split by chunks
+  const assetChunks = [];
+  for (let i = 0; i < assets.length; i += chunkSize) {
+    const assetsChunk = assets.slice(i, i + chunkSize).map(({ code, issuer }) => ({ code, issuer }));
+    assetChunks.push(assetsChunk);
+  }
+  // Request data
+  const results = await Promise.all(assetChunks.map(fetchPricesChunk));
 
-  return post(NATIVE_PRICES_URL, { body }).then(({ results }) => results);
+  // create collection 'code:issuer' -> price
+  return results.flat().reduce((collection: Map<string, number>, data: AlternativeRatesResponse) => {
+    const price: number | undefined = data.last_native_rate?.base_asset === 'native' ?
+        data.last_native_rate?.reverse_rate :
+        data.last_native_rate?.rate;
+    collection.set(getAssetString(data), price || 0);
+    return collection;
+  }, new Map());
+};
+const fetchPricesChunk = async (chunk: AssetSimple[]): Promise<AlternativeRatesResponse[]> => {
+  const body = JSON.stringify(chunk);
+  return await post(ALTERNATIVE_PRICES_URL, { body });
 };
 
 export const getLumenQuotes = (): Promise<{ quotes: LumenQuote[] }> =>
