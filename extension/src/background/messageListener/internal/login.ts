@@ -1,5 +1,5 @@
 import { checkLogin } from "@shared/api/lobstr-api";
-import { allAccountsSelector, logIn, selectConnection, selectedConnectionSelector } from "../../ducks/session";
+import { allAccountsSelector, logIn, selectConnection } from "../../ducks/session";
 import { updateSelectedConnection } from "../../helpers/updateSelectedConnection";
 import { store } from "../../store";
 import { saveAllAccounts } from "../../helpers/account";
@@ -36,10 +36,10 @@ export async function login(uuid: string) {
             return { error: `${connectionKey} is already exists` };
         }
 
-        const savedConnection = selectedConnectionSelector(store.getState());
+        // Update selected account to a new account
         const selectedConnection = await updateSelectedConnection(
             updatedAccounts,
-            savedConnection,
+            connectionKey,
         );
         store.dispatch(selectConnection({ selectedConnection }));
         store.dispatch(logIn({ allAccounts: updatedAccounts }));
