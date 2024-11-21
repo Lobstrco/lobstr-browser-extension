@@ -14,3 +14,8 @@
 # v1.1.0
 
 - Add a new home page with account balances.
+
+# v1.2.0
+
+- Code refactoring.
+- Changed url for prices.
