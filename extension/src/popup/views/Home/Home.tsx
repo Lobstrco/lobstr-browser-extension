@@ -217,7 +217,6 @@ const Home = () => {
       ...(rest as BalanceAssetExtended[]).sort(
         (a, b) =>
           b.nativeBalance - a.nativeBalance ||
-          +b.balance - +a.balance ||
           a.asset_code.localeCompare(b.asset_code),
       ),
     ];

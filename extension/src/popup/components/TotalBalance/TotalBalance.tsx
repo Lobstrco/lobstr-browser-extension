@@ -83,7 +83,7 @@ const TotalBalance = ({
             )}${isNativeCurrency ? " XLM" : ""}`}
       </Balance>
       <Switcher>
-        Your total balance
+        Estimated portfolio value
         <img src={isHiddenMode ? Eye : EyeCrossed} alt="show" />
       </Switcher>
     </Container>

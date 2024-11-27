@@ -19,3 +19,8 @@
 
 - Code refactoring.
 - Changed url for prices.
+
+# v1.2.1
+
+- Changed label for the total balance.
+- Changed sorting algorithm.
