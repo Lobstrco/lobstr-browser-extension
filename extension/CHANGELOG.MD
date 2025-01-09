@@ -24,3 +24,8 @@
 
 - Changed label for the total balance.
 - Changed sorting algorithm.
+
+
+# v1.2.2
+
+- Allow to use the extension in all frames.
