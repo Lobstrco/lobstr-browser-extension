@@ -56,8 +56,8 @@ const WalletsList = styled(List)`
 const Wallet = styled.div`
   display: flex;
   justify-content: space-between;
-  padding: 1.2rem 0;
   position: relative;
+  align-items: center;
 
   &:last-child {
     padding-bottom: 4rem;
@@ -81,9 +81,17 @@ const StyledMenu = styled(Menu)`
 `;
 
 const AccountViewStyled = styled(AccountView)`
+  height: 5.8rem;
+  padding: 1.2rem 0.8rem;
   cursor: pointer;
+  border-radius: 0.6rem;
+  flex: 1;
+  min-width: 0;
+
   &:hover {
     background-color: ${COLORS.hover};
+    --account-background-color: ${COLORS.hover};
+    --identicon-background-color: ${COLORS.white};
   }
 `;
 
@@ -139,11 +147,12 @@ const Wallets = () => {
         </Header>
         <WalletsList $withScroll={allAccounts.length > 3}>
           {allAccounts.map(
-            ({ publicKey, federation, connectionKey, userAgent }) => (
+            ({ publicKey, federation, nickname, connectionKey, userAgent }) => (
               <Wallet key={connectionKey}>
                 <AccountViewStyled
                   publicKey={publicKey}
                   federation={federation}
+                  nickname={nickname}
                   userAgent={userAgent}
                   onClick={() => chooseCurrentWallet(connectionKey)}
                 />

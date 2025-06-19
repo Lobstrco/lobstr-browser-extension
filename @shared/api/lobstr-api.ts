@@ -24,6 +24,7 @@ export const updateConnection = (
         connection_key,
         public_key,
         federation_address,
+        nickname,
         user_agent,
         currency,
       } = res;
@@ -32,6 +33,7 @@ export const updateConnection = (
         publicKey: public_key,
         connectionKey: connection_key,
         federation: federation_address,
+        nickname,
         userAgent: user_agent,
         currency,
       };
@@ -56,6 +58,7 @@ export const checkLogin = (
         connection_key,
         public_key,
         federation_address,
+        nickname,
         user_agent,
         currency,
       } = data;
@@ -65,6 +68,7 @@ export const checkLogin = (
             publicKey: public_key,
             connectionKey: connection_key,
             federation: federation_address,
+            nickname,
             userAgent: user_agent,
             lastActivityTime: Date.now(),
             currency,
@@ -73,6 +77,7 @@ export const checkLogin = (
             publicKey: public_key,
             connectionKey: connection_key,
             federation: federation_address,
+            nickname,
             userAgent: user_agent,
             lastActivityTime: Date.now(),
             currency,

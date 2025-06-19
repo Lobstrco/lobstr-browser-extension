@@ -27,6 +27,7 @@ export interface ExternalRequestTx {
 export interface Account {
   publicKey: string;
   federation: string;
+  nickname: string;
   connectionKey: string;
   userAgent: string;
   lastActivityTime: number;
@@ -52,6 +53,7 @@ export interface GetConnectionResponse {
   connection_key: string;
   public_key: string;
   federation_address: string;
+  nickname: string;
   user_agent: string;
   currency: Currency;
 }

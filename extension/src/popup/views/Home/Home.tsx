@@ -5,7 +5,11 @@ import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
 import { HORIZON_URL } from "@shared/constants/stellar";
 import { getLumenQuotes, getPricesCollection } from "@shared/api/internal";
-import { BalanceAssetExtended, BalanceNativeExtended, LumenQuote } from "@shared/constants/types";
+import {
+  BalanceAssetExtended,
+  BalanceNativeExtended,
+  LumenQuote,
+} from "@shared/constants/types";
 import { WrapperStyles } from "../../styles/common";
 import Popup from "../../basics/Popup/Popup";
 import {
@@ -58,12 +62,17 @@ const StyledTooltip = styled(Tooltip)`
 const HeaderButton = styled.div`
   display: flex;
   align-items: center;
+
+  gap: 1.2rem;
+  height: 5.8rem;
+  padding: 1.2rem 0.8rem;
   cursor: pointer;
-  padding: 0.3rem;
-  border-radius: 0.3rem;
+  border-radius: 0.6rem;
 
   &:hover {
     background-color: ${COLORS.hover};
+    --account-background-color: ${COLORS.hover};
+    --identicon-background-color: ${COLORS.white};
   }
 `;
 
@@ -100,7 +109,9 @@ const Home = () => {
     | null
   >(null);
 
-  const [nativePrices, setNativePrices] = useState<Map<string, number> | null>(null);
+  const [nativePrices, setNativePrices] = useState<Map<string, number> | null>(
+    null,
+  );
   const [lumenQuotes, setLumenQuotes] = useState<LumenQuote[] | null>(null);
 
   const server = useMemo(() => new StellarSdk.Horizon.Server(HORIZON_URL), []);
@@ -207,9 +218,7 @@ const Home = () => {
     const [native, ...rest] = [...balances].reverse().map((balance: any) => {
       const assetKey: string = `${balance.asset_code}:${balance.asset_issuer}`;
       const nativePrice: number =
-        balance.asset_type === "native"
-          ? 1
-          : nativePrices.get(assetKey) ?? 0;
+        balance.asset_type === "native" ? 1 : nativePrices.get(assetKey) ?? 0;
       return { ...balance, nativeBalance: +balance.balance * nativePrice };
     });
     return [
@@ -244,6 +253,7 @@ const Home = () => {
             <AccountView
               publicKey={currentAccount!.publicKey}
               federation={currentAccount!.federation}
+              nickname={currentAccount!.nickname}
               userAgent={currentAccount!.userAgent}
               isNarrow
             />

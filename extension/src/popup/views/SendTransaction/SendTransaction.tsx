@@ -142,6 +142,14 @@ const SendTransaction = () => {
     sign();
   }, [sign, reject, account]);
 
+  const accountName = useMemo(
+    () =>
+      account?.nickname ||
+      account?.federation ||
+      truncatedPublicKey(account?.publicKey || ""),
+    [account],
+  );
+
   return (
     <Popup>
       <Wrapper>
@@ -162,10 +170,7 @@ const SendTransaction = () => {
       <AccountBlock>
         <IdentIcon publicKey={account?.publicKey || ""} />
         <AccountInfo>
-          <span>
-            {account?.federation ||
-              truncatedPublicKey(account?.publicKey || "")}
-          </span>
+          <span>{accountName}</span>
           <span>Waiting for confirmation</span>
         </AccountInfo>
       </AccountBlock>

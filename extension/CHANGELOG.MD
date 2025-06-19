@@ -25,3 +25,7 @@
 - Changed label for the total balance.
 - Changed sorting algorithm.
 - Allow to use the extension in all frames.
+
+# v1.2.2
+
+- Added nickname support

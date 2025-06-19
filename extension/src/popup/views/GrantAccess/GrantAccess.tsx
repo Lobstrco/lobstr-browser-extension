@@ -88,6 +88,7 @@ const WalletsList = styled(List)`
 
 const Wallet = styled.div<{ selected: boolean }>`
   display: flex;
+  align-items: center;
   cursor: pointer;
   padding: 1.2rem 0.8rem;
   border-radius: 0.6rem;
@@ -115,6 +116,11 @@ const Buttons = styled.div`
   display: flex;
   gap: 0.9rem;
   padding: 0 2.4rem 1.6rem;
+`;
+
+const CheckIconImg = styled.img`
+  width: 2.4rem;
+  height: 2.4rem;
 `;
 
 const GrantAccess = () => {
@@ -191,7 +197,7 @@ const GrantAccess = () => {
       <Wrapper>
         <WalletsList $withScroll={sortedAccounts.length > 2}>
           {sortedAccounts.map(
-            ({ publicKey, federation, connectionKey, userAgent }) => (
+            ({ publicKey, federation, nickname, connectionKey, userAgent }) => (
               <Wallet
                 key={connectionKey}
                 onClick={() => setSelectedWalletKey(connectionKey)}
@@ -200,10 +206,11 @@ const GrantAccess = () => {
                 <AccountView
                   publicKey={publicKey}
                   federation={federation}
+                  nickname={nickname}
                   userAgent={userAgent}
                 />
                 {connectionKey === selectedWalletKey && (
-                  <img src={CheckIcon} alt="checked" />
+                  <CheckIconImg src={CheckIcon} alt="checked" />
                 )}
               </Wallet>
             ),

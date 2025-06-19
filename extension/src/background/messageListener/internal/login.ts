@@ -10,6 +10,7 @@ export async function login(uuid: string) {
         const {
             publicKey,
             federation,
+            nickname,
             connectionKey,
             userAgent,
             lastActivityTime,
@@ -25,6 +26,7 @@ export async function login(uuid: string) {
             {
                 publicKey,
                 federation,
+                nickname,
                 connectionKey,
                 userAgent,
                 lastActivityTime,

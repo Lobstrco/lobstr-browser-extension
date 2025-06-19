@@ -15,7 +15,7 @@ const Container = styled.div`
   min-width: 3.2rem;
   min-height: 3.2rem;
   border-radius: 50%;
-  background-color: ${COLORS.hover};
+  background-color: var(--identicon-background-color, ${COLORS.hover});
 `;
 
 const Icon = styled.img`
