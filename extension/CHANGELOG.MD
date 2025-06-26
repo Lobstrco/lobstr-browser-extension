@@ -27,5 +27,6 @@
 - Allow to use the extension in all frames.
 
 # v1.2.2
+# v1.3.0
 
 - Added nickname support
