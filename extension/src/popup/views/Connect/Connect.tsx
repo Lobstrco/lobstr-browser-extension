@@ -29,6 +29,7 @@ import ArrowIcon from "popup/assets/icon-arrow-right.svg";
 import Ios from "popup/assets/ios.svg";
 import Android from "popup/assets/android.svg";
 import BackIcon from "popup/assets/icon-back.svg";
+import { cancelLoginPolling } from "@shared/api/internal";
 
 const Wrapper = styled.div`
   ${WrapperStyles};
@@ -124,6 +125,11 @@ const Connect = () => {
 
   useOnClickOutside(ref, () => setShowLinks(false));
 
+  const handleBackNavigation = () => {
+    cancelLoginPolling();
+    navigate(-1);
+  };
+
   useEffect(() => {
     dispatch(login(uuid));
   }, [uuid, dispatch]);
@@ -137,15 +143,23 @@ const Connect = () => {
 
   useEffect(() => {
     if (allAccounts.find(({ connectionKey }) => connectionKey === uuid)) {
+      cancelLoginPolling();
       navigate(-1);
     }
   }, [uuid, allAccounts, navigate]);
+
+  useEffect(
+    () => () => {
+      cancelLoginPolling();
+    },
+    [],
+  );
 
   return (
     <Popup>
       <Wrapper>
         {Boolean(allAccounts.length) && (
-          <BackButton onClick={() => navigate(-1)}>
+          <BackButton onClick={handleBackNavigation}>
             <img src={BackIcon} alt="back" />
             <span>Back</span>
           </BackButton>
@@ -179,7 +193,7 @@ const Connect = () => {
       <DontHaveLobstr onClick={() => setShowLinks(true)}>
         <img src={Logo} alt="Logo" />
         <DontHaveLobstrText>
-          Don’t have the LOBSTR mobile app installed?{" "}
+          Don't have the LOBSTR mobile app installed?{" "}
         </DontHaveLobstrText>
         <Arrow src={ArrowIcon} alt=">" />
         {showLinks && (

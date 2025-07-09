@@ -3,7 +3,8 @@ import {
   Asset,
   AssetSimple,
   LumenQuote,
-  AlternativeRatesResponse
+  AlternativeRatesResponse,
+  Response
 } from "@shared/constants/types";
 import { APPLICATION_STATES } from "@shared/constants/applicationState";
 import { getAssetString } from "extension/src/background/helpers/stellar";
@@ -60,6 +61,11 @@ export const logout = (
   sendMessageToBackground({
     connectionKey,
     type: SERVICE_TYPES.LOGOUT,
+  });
+
+export const cancelLoginPolling = (): Promise<Response> =>
+  sendMessageToBackground({
+    type: SERVICE_TYPES.CANCEL_LOGIN_POLLING,
   });
 
 // ACCESS

@@ -15,10 +15,20 @@ const LOGIN_POLLING_ATTEMPTS = 60; // 5 minutes
 
 let timeout: any;
 
+// Function to cancel login polling
+export const cancelLoginPolling = () => {
+  if (timeout) {
+    clearTimeout(timeout);
+    timeout = null;
+  }
+};
+
 export const updateConnection = (
-  uuid: string,
-): Promise<Omit<Account, 'lastActivityTime'> | null> =>
-  get(`${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`)
+  connection: Account,
+): Promise<Omit<Account, "lastActivityTime"> | null> =>
+  get(
+    `${API_URL}/api/v1/lobstr-extension/connections/${connection.connectionKey}/`,
+  )
     .then((res) => {
       const {
         connection_key,
@@ -38,7 +48,10 @@ export const updateConnection = (
         currency,
       };
     })
-    .catch(() => null);
+    .catch((error) => {
+      const status = error?.response?.status;
+      return status === 404 ? null : connection;
+    });
 
 export const checkLogin = (
   uuid: string,
@@ -116,7 +129,7 @@ export const signWithLobstr = (
   )
     .then((res) => res.id)
     .then((id) => checkTxStatus(uuid, id))
-    .then((xdr) => xdr ? xdr : Promise.reject('User declined access'));
+    .then((xdr) => (xdr ? xdr : Promise.reject("User declined access")));
 };
 
 const PollingMap = new Map<

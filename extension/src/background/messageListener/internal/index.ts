@@ -12,6 +12,7 @@ import { processNewAssets } from "./processNewAssets";
 import { login } from "./login";
 import { selectNewConnection } from "./selectNewConnection";
 import { logout } from "./logout";
+import { cancelLoginPolling } from "./cancelLoginPolling";
 
 export function internalMessagesListener(request: Request) {
     switch (request.type) {
@@ -39,6 +40,8 @@ export function internalMessagesListener(request: Request) {
             return loadCachedAssets();
         case SERVICE_TYPES.TOGGLE_HIDDEN_MODE:
             return toggleAppHiddenMode();
+        case SERVICE_TYPES.CANCEL_LOGIN_POLLING:
+            return cancelLoginPolling();
         default:
             return Promise.resolve();
     }
