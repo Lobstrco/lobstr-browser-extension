@@ -30,3 +30,8 @@
 # v1.3.0
 
 - Added nickname support
+
+# v1.3.1
+
+- Fixed connections remove on network error
+- Added request cancellation on "connection add" screen exit
