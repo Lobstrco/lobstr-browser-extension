@@ -35,3 +35,7 @@
 
 - Fixed connections remove on network error
 - Added request cancellation on "connection add" screen exit
+
+# v1.3.2
+- BREAKING: Completely removed Redux store and session management infrastructure. Updated message listeners to directly handle account operations without Redux dependencies
+- Refactor: Simplified session state management by removing unused properties and selectors
