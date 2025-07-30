@@ -1,7 +1,5 @@
 import { checkLogin } from "@shared/api/lobstr-api";
-import { logIn, selectConnection } from "../../ducks/session";
 import { updateSelectedConnection } from "../../helpers/updateSelectedConnection";
-import { store } from "../../store";
 import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
 import { getUpdatedAccounts } from "../../helpers/getUpdatedAccounts";
 
@@ -46,8 +44,6 @@ export async function login(uuid: string) {
             updatedAccounts,
             connectionKey,
         );
-        store.dispatch(selectConnection({ selectedConnection }));
-        store.dispatch(logIn({ allAccounts: updatedAccounts }));
 
         await saveAllAccounts(updatedAccounts);
 

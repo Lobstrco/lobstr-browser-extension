@@ -5,10 +5,9 @@ import {
     SignRequestResolve,
 } from "@shared/constants/mesagesData.types";
 import { signWithLobstr } from "@shared/api/lobstr-api";
-import { logIn } from "../../ducks/session";
 import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
-import { store } from "../../store";
 import { MessageError } from "../../helpers/messageError";
+import { Account } from "@shared/constants/types";
 
 export async function signTransaction(data: RequestWithOperation) {
     const { operationId } = data;
@@ -46,23 +45,12 @@ export async function signTransaction(data: RequestWithOperation) {
 }
 
 async function _updateLastActivityTime(connectionKey: string): Promise<void> {
-    // Always load accounts from localStorage instead of relying on Redux store
-    // which can be reset when service worker restarts
-    const allAccounts = await getAllAccounts();
-    const allAccountsCopy = [...allAccounts];
-
-    const activeAccountIndex = allAccounts.findIndex(
-        ({ connectionKey: key }: { connectionKey: string }) =>
-            key === connectionKey,
+    const allAccounts: Account[] = await getAllAccounts();
+    const updatedAccounts: Account[] = allAccounts.map((account: Account) =>
+        account.connectionKey === connectionKey
+            ? { ...account, lastActivityTime: Date.now() }
+            : account,
     );
 
-    if (activeAccountIndex === -1) {
-        return;
-    }
-    allAccountsCopy[activeAccountIndex] = {
-        ...allAccountsCopy[activeAccountIndex],
-        ...{ lastActivityTime: Date.now() },
-    };
-    store.dispatch(logIn({ allAccounts: allAccountsCopy }));
-    await saveAllAccounts(allAccountsCopy);
+    await saveAllAccounts(updatedAccounts);
 }

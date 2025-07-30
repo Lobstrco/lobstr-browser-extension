@@ -1,11 +1,9 @@
-import { isHiddenModeSelector, toggleHiddenMode } from "../../ducks/session";
-import { saveIsHiddenMode } from "../../helpers/account";
-import { store } from "../../store";
+import { getIsHiddenMode, saveIsHiddenMode } from "../../helpers/account";
 
 export async function toggleAppHiddenMode() {
-    const newState = !isHiddenModeSelector(store.getState());
+    const currentState = await getIsHiddenMode();
+    const newState = !currentState;
     await saveIsHiddenMode(newState);
-    store.dispatch(toggleHiddenMode());
 
     return {
         isHiddenMode: newState,
