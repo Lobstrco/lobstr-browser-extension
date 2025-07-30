@@ -1,9 +1,10 @@
-import { allAccountsSelector, selectConnection } from "../../ducks/session";
+import { selectConnection } from "../../ducks/session";
 import { updateSelectedConnection } from "../../helpers/updateSelectedConnection";
 import { store } from "../../store";
+import { getAllAccounts } from "../../helpers/account";
 
 export async function selectNewConnection(connectionKey: string) {
-    const allAccounts = allAccountsSelector(store.getState());
+    const allAccounts = await getAllAccounts();
     const selectedConnection = await updateSelectedConnection(
         allAccounts,
         connectionKey,

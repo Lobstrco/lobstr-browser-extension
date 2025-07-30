@@ -1,16 +1,21 @@
-import { allAccountsSelector, logOut, selectConnection, selectedConnectionSelector } from "../../ducks/session";
+import {
+    logOut,
+    selectConnection,
+    selectedConnectionSelector,
+} from "../../ducks/session";
 import { logoutFromLobstr } from "@shared/api/lobstr-api";
 import { updateSelectedConnection } from "../../helpers/updateSelectedConnection";
 import { store } from "../../store";
-import { saveAllAccounts } from "../../helpers/account";
+import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
 
 export async function logout(connectionKey: string) {
-    const allAccounts = allAccountsSelector(store.getState());
+    const allAccounts = await getAllAccounts();
 
     await logoutFromLobstr(connectionKey);
 
     const updatedAccounts = allAccounts.filter(
-        ({ connectionKey: key }) => key !== connectionKey,
+        (account: { connectionKey: string }) =>
+            account.connectionKey !== connectionKey,
     );
 
     const savedConnection = selectedConnectionSelector(store.getState());

@@ -1,14 +1,11 @@
-import {
-    allAccountsSelector,
-    applicationIdSelector,
-    isHiddenModeSelector,
-    isStorageCheckedSelector, loadSavedState, selectConnection, selectedConnectionSelector, setStorageChecked
-} from "../../ducks/session";
+import { loadSavedState, selectConnection } from "../../ducks/session";
 import {
     getAllAccounts,
-    getApplicationId, getIsHiddenMode, getSelectedConnection,
+    getApplicationId,
+    getIsHiddenMode,
+    getSelectedConnection,
     saveAllAccounts,
-    saveApplicationId
+    saveApplicationId,
 } from "../../helpers/account";
 import { Account } from "@shared/constants/types";
 
@@ -18,42 +15,6 @@ import { getUpdatedAccounts } from "../../helpers/getUpdatedAccounts";
 import { updateSelectedConnection } from "../../helpers/updateSelectedConnection";
 
 export async function loadState() {
-    const currentState = store.getState();
-
-    if (isStorageCheckedSelector(currentState)) {
-        const allAccounts = await getUpdatedAccounts(
-            allAccountsSelector(currentState),
-        );
-        const applicationId = applicationIdSelector(currentState);
-        await saveAllAccounts(allAccounts);
-        const isHiddenMode = isHiddenModeSelector(currentState);
-        const savedConnection = selectedConnectionSelector(currentState);
-
-        const selectedConnection = await updateSelectedConnection(
-            allAccounts,
-            savedConnection,
-        );
-        store.dispatch(
-            selectConnection({ selectedConnection }),
-        );
-
-        store.dispatch(
-            loadSavedState({
-                allAccounts,
-                applicationId,
-                isHiddenMode,
-                selectedConnection,
-            }),
-        );
-
-        return {
-            allAccounts,
-            applicationId,
-            isHiddenMode,
-            selectedConnection,
-        };
-    }
-
     const allAccounts: Account[] = await getAllAccounts();
     const filteredAccounts = await getUpdatedAccounts(allAccounts);
     await saveAllAccounts(filteredAccounts);
@@ -72,9 +33,7 @@ export async function loadState() {
         filteredAccounts,
         savedConnection,
     );
-    store.dispatch(
-        selectConnection({ selectedConnection }),
-    );
+    store.dispatch(selectConnection({ selectedConnection }));
 
     store.dispatch(
         loadSavedState({
@@ -84,7 +43,6 @@ export async function loadState() {
             selectedConnection,
         }),
     );
-    store.dispatch(setStorageChecked());
 
     return {
         allAccounts: filteredAccounts,

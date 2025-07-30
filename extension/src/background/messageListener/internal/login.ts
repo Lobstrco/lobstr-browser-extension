@@ -1,8 +1,8 @@
 import { checkLogin } from "@shared/api/lobstr-api";
-import { allAccountsSelector, logIn, selectConnection } from "../../ducks/session";
+import { logIn, selectConnection } from "../../ducks/session";
 import { updateSelectedConnection } from "../../helpers/updateSelectedConnection";
 import { store } from "../../store";
-import { saveAllAccounts } from "../../helpers/account";
+import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
 import { getUpdatedAccounts } from "../../helpers/getUpdatedAccounts";
 
 export async function login(uuid: string) {
@@ -17,8 +17,7 @@ export async function login(uuid: string) {
             currency,
         } = await checkLogin(uuid);
 
-        const allAccounts = allAccountsSelector(store.getState());
-
+        const allAccounts = await getAllAccounts();
         const filteredAccounts = await getUpdatedAccounts(allAccounts);
 
         const updatedAccounts = [
@@ -34,7 +33,11 @@ export async function login(uuid: string) {
             },
         ];
 
-        if (allAccounts.find(({ connectionKey: key }) => key === connectionKey)) {
+        const accountExists = allAccounts.find(
+            (account: { connectionKey: string }) =>
+                account.connectionKey === connectionKey,
+        );
+        if (accountExists) {
             return { error: `${connectionKey} is already exists` };
         }
 

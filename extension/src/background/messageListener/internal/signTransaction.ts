@@ -1,19 +1,29 @@
 import { AsyncOperationsStore } from "../../helpers/asyncOperations";
-import { RequestSignAdditional, RequestWithOperation, SignRequestResolve } from "@shared/constants/mesagesData.types";
+import {
+    RequestSignAdditional,
+    RequestWithOperation,
+    SignRequestResolve,
+} from "@shared/constants/mesagesData.types";
 import { signWithLobstr } from "@shared/api/lobstr-api";
-import { allAccountsSelector, logIn } from "../../ducks/session";
-import { saveAllAccounts } from "../../helpers/account";
+import { logIn } from "../../ducks/session";
+import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
 import { store } from "../../store";
 import { MessageError } from "../../helpers/messageError";
 
 export async function signTransaction(data: RequestWithOperation) {
     const { operationId } = data;
-    const operation = AsyncOperationsStore.get<SignRequestResolve, RequestSignAdditional>(operationId);
+    const operation = AsyncOperationsStore.get<
+        SignRequestResolve,
+        RequestSignAdditional
+    >(operationId);
     if (!operation) {
-        console.error(`Missing operation for transactionSign with id ${operationId}`);
+        console.error(
+            `Missing operation for transactionSign with id ${operationId}`,
+        );
         return;
     }
-    const { transactionXdr, connectionKey, domain } = operation.getAdditionalData()!;
+    const { transactionXdr, connectionKey, domain } =
+        operation.getAdditionalData()!;
 
     if (!transactionXdr) {
         operation.reject("transactionXDR is not exists");
@@ -30,18 +40,20 @@ export async function signTransaction(data: RequestWithOperation) {
         );
         operation.resolve({ signedTransaction });
     } catch (e) {
-        const message: string = typeof e === 'string' ? e : 'Sign failed';
+        const message: string = typeof e === "string" ? e : "Sign failed";
         operation.reject(new MessageError(message));
     }
 }
 
-async function _updateLastActivityTime(connectionKey: string): Promise<void>  {
-    const currentState = store.getState();
-    const allAccounts = allAccountsSelector(currentState);
+async function _updateLastActivityTime(connectionKey: string): Promise<void> {
+    // Always load accounts from localStorage instead of relying on Redux store
+    // which can be reset when service worker restarts
+    const allAccounts = await getAllAccounts();
     const allAccountsCopy = [...allAccounts];
 
     const activeAccountIndex = allAccounts.findIndex(
-        ({ connectionKey: key }) => key === connectionKey,
+        ({ connectionKey: key }: { connectionKey: string }) =>
+            key === connectionKey,
     );
 
     if (activeAccountIndex === -1) {
