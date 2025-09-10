@@ -1,7 +1,15 @@
 {
   "extends": "../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "src/",
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["../@shared/*"],
+      "background/*": ["src/background/*"],
+      "contentScript/*": ["src/contentScript/*"],
+      "popup/*": ["src/popup/*"],
+      "constants/*": ["src/constants/*"],
+      "helpers/*": ["src/helpers/*"]
+    },
     "types": [
       "@types/chrome",
       "@types/jest",

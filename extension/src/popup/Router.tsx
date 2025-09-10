@@ -17,7 +17,7 @@ import { AppDispatch } from "./App";
 import Loading from "./components/Loading/Loading";
 import Wallets from "./views/Wallets/Wallets";
 import GrantAccess from "./views/GrantAccess/GrantAccess";
-import SendTransaction from "./views/SendTransaction/SendTransaction";
+import SignModal from "./views/SignModal/SignModal";
 import Home from "./views/Home/Home";
 import { loadCachedAssetsInfo } from "./ducks/assets";
 import { ROUTES } from "popup/constants/routes";
@@ -88,7 +88,7 @@ export const Router = () => {
         <Route path={ROUTES.home} element={<Home />} />
         <Route path={ROUTES.wallets} element={<Wallets />} />
         <Route path={ROUTES.grantAccess} element={<GrantAccess />} />
-        <Route path={ROUTES.sendTransaction} element={<SendTransaction />} />
+        <Route path={ROUTES.signModal} element={<SignModal />} />
       </Routes>
     </HashRouter>
   );

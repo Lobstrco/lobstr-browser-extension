@@ -3,7 +3,6 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const ESLintPlugin = require("eslint-webpack-plugin");
 const HtmlWebPackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 const webpack = require("webpack");
 
 const { DEFAULT_STATS } = require("../config/webpack");
@@ -37,11 +36,14 @@ const commonConfig = () => ({
   },
   resolve: {
     extensions: [".ts", ".tsx", ".js"],
-    plugins: [
-      new TsconfigPathsPlugin({
-        configFile: path.resolve(__dirname, "./tsconfig.json"),
-      }),
-    ],
+    alias: {
+      "@shared": path.resolve(__dirname, "../@shared"),
+      "background": path.resolve(__dirname, "./src/background"),
+      "contentScript": path.resolve(__dirname, "./src/contentScript"),
+      "popup": path.resolve(__dirname, "./src/popup"),
+      "constants": path.resolve(__dirname, "./src/constants"),
+      "helpers": path.resolve(__dirname, "./src/helpers"),
+    },
     fallback: {
       fs: false,
       stream: require.resolve("stream-browserify"),
@@ -67,7 +69,16 @@ const commonConfig = () => ({
       },
       {
         test: /\.(ts|tsx)$/,
-        use: ["ts-loader"],
+        use: [{
+          loader: "babel-loader",
+          options: {
+            presets: [
+              ["@babel/preset-env", { targets: { node: "current" } }],
+              "@babel/preset-typescript",
+              "@babel/preset-react"
+            ]
+          }
+        }],
         exclude: /node-modules/,
       },
       {

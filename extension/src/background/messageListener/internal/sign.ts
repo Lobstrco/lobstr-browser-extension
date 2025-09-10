@@ -9,35 +9,34 @@ import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
 import { MessageError } from "../../helpers/messageError";
 import { Account } from "@shared/constants/types";
 
-export async function signTransaction(data: RequestWithOperation) {
+export async function sign(data: RequestWithOperation) {
     const { operationId } = data;
     const operation = AsyncOperationsStore.get<
         SignRequestResolve,
         RequestSignAdditional
     >(operationId);
     if (!operation) {
-        console.error(
-            `Missing operation for transactionSign with id ${operationId}`,
-        );
+        console.error(`Missing operation for sign with id ${operationId}`);
         return;
     }
-    const { transactionXdr, connectionKey, domain } =
+    const { dataToSign, connectionKey, domain, signType } =
         operation.getAdditionalData()!;
 
-    if (!transactionXdr) {
-        operation.reject("transactionXDR is not exists");
+    if (!dataToSign) {
         return;
     }
 
     await _updateLastActivityTime(connectionKey);
 
     try {
-        const signedTransaction = await signWithLobstr(
-            transactionXdr,
+        const signedData = await signWithLobstr(
+            dataToSign,
             connectionKey,
             domain,
+            signType,
         );
-        operation.resolve({ signedTransaction });
+        const signerAddress = await _getSignerAddress(connectionKey);
+        operation.resolve({ signedData, signerAddress });
     } catch (e) {
         const message: string = typeof e === "string" ? e : "Sign failed";
         operation.reject(new MessageError(message));
@@ -53,4 +52,12 @@ async function _updateLastActivityTime(connectionKey: string): Promise<void> {
     );
 
     await saveAllAccounts(updatedAccounts);
+}
+
+async function _getSignerAddress(connectionKey: string): Promise<string> {
+    const allAccounts: Account[] = await getAllAccounts();
+    const foundAccount = allAccounts.find(
+        (account: Account) => account.connectionKey === connectionKey,
+    );
+    return foundAccount?.publicKey || "";
 }

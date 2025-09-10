@@ -3,6 +3,6 @@ export enum ROUTES {
   connect = "/connect",
   wallets = "/wallets",
   grantAccess = "/grant-access",
-  sendTransaction = "/send-transaction",
+  signModal = "/sign-modal",
   home = "/home",
 }

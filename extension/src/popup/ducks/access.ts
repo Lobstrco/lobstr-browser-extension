@@ -3,8 +3,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import {
   rejectAccess as internalRejectAccess,
   grantAccess as internalGrantAccess,
-  signTransaction as internalSignTransaction,
-  rejectTransaction as internalRejectTransaction,
+  sign as internalSign,
+  rejectSigning as internalRejectSigning,
 } from "@shared/api/internal";
 
 export const grantAccess = createAsyncThunk("grantAccess", internalGrantAccess);
@@ -14,15 +14,15 @@ export const rejectAccess = createAsyncThunk(
   internalRejectAccess,
 );
 
-export const signTransaction = createAsyncThunk(
-  "signTransaction",
-  internalSignTransaction,
+export const sign = createAsyncThunk(
+  "sign",
+  internalSign,
 );
 
 // Basically an alias for metrics purposes
-export const rejectTransaction = createAsyncThunk(
-  "rejectTransaction",
-  internalRejectTransaction,
+export const rejectSigning = createAsyncThunk(
+  "rejectSigning",
+  internalRejectSigning,
 );
 
 // Basically an alias for metrics purposes

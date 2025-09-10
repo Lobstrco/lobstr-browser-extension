@@ -2,7 +2,7 @@ import { AsyncOperationsStore } from "../../helpers/asyncOperations";
 import { RequestWithOperation } from "@shared/constants/mesagesData.types";
 import { MessageError } from "../../helpers/messageError";
 
-export function rejectTransaction(data: RequestWithOperation) {
+export function rejectSigning(data: RequestWithOperation) {
     const { operationId } = data;
     const operation = AsyncOperationsStore.get(operationId);
     if (!operation) {

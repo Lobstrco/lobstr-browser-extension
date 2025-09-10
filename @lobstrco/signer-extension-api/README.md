@@ -1,5 +1,8 @@
 # @lobstrco/signer-extension-api
 
+[![npm version](https://badge.fury.io/js/%40lobstrco%2Fsigner-extension-api.svg)](https://badge.fury.io/js/%40lobstrco%2Fsigner-extension-api)
+[![Package size](https://img.shields.io/bundlephobia/minzip/@lobstrco/signer-extension-api)](https://bundlephobia.com/package/@lobstrco/signer-extension-api)
+
 This package builds a wrapper around the messaging system used to interact with the LOBSTR browser extension. Client applications will be able to install this package from npm and then integrate it with the LOBSTR signer extension using dev-friendly methods.
 
 ## User Interface Guideline
@@ -48,6 +51,7 @@ import {
  isConnected,
  getPublicKey,
  signTransaction,
+ signMessage,
 } from "@lobstrco/signer-extension-api";
 ```
 
@@ -121,6 +125,34 @@ const userSignTransaction = async (xdr: string): Promise<string> => {
   }
 
   return signedTransaction;
+};
+```
+
+### signMessage
+
+```signMessage(message: string) -> <Promise<{signedMessage: string, signerAddress: string} | null>>```
+
+This function accepts a message string, which it will sign and return an object containing the signed message and the signer's address to your application.
+
+```typescript
+import { signMessage } from "@lobstrco/signer-extension-api";
+
+const userSignMessage = async (message: string): Promise<{signedMessage: string, signerAddress: string} | null> => {
+  let result = null;
+  let error = "";
+
+  try {
+    result = await signMessage(message);
+  } catch (e) {
+    error = e;
+  }
+
+  if (error) {
+    console.error("Error signing message:", error);
+    return null;
+  }
+
+  return result;
 };
 ```
 

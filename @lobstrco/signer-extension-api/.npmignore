@@ -1,0 +1,24 @@
+# Source files
+src/
+__mocks__/
+
+# Build configuration
+webpack.*.js
+babel.config.js
+tsconfig.json
+
+# Development files
+yarn.lock
+*.log
+
+# Internal documentation
+MONOREPO.MD
+
+# Tests
+**/*.test.js
+**/*.test.ts
+**/__tests__/
+
+# Build artifacts that shouldn't be published
+build/@shared/
+build/config/

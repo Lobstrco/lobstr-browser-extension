@@ -1,6 +1,7 @@
 import * as StellarSdk from "@stellar/stellar-sdk";
 import { EXTERNAL_SERVICE_TYPES, SERVICE_TYPES } from "./services";
 import { APPLICATION_STATES } from "./applicationState";
+import { API_VERSION } from "./api-version";
 
 export interface Request {
   applicationState: APPLICATION_STATES;
@@ -18,10 +19,18 @@ export interface GetPublicKeyResponse {
   connectionKey: string;
 }
 
-export interface ExternalRequestTx {
-  transactionXdr: string;
+export interface ExternalRequestTxV1 {
   connectionKey: string;
+  transactionXdr: string;
   type: EXTERNAL_SERVICE_TYPES;
+}
+
+export interface ExternalRequestTxV2 {
+  dataToSign: string;
+  connectionKey: string;
+  signType: "transaction" | "message";
+  type: EXTERNAL_SERVICE_TYPES;
+  version: API_VERSION;
 }
 
 export interface Account {

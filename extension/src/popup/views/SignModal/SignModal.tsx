@@ -12,7 +12,7 @@ import {
 } from "../../styles/common";
 import { parsedSearchParam } from "../../../helpers/urls";
 import { AppDispatch } from "../../App";
-import { rejectTransaction, signTransaction } from "../../ducks/access";
+import { rejectSigning, sign } from "../../ducks/access";
 import { allAccountsSelector } from "../../ducks/authService";
 
 import { COLORS } from "../../styles/colors";
@@ -110,12 +110,12 @@ const AccountInfo = styled.div`
   }
 `;
 
-const SendTransaction = () => {
+const SignModal = () => {
   const location = useLocation();
 
   const dispatch: AppDispatch = useDispatch();
 
-  const { connectionKey, operationId } = parsedSearchParam<RequestSignData>(location.search);
+  const { connectionKey, operationId, signType } = parsedSearchParam<RequestSignData>(location.search);
 
   const allAccounts = useSelector(allAccountsSelector);
 
@@ -124,23 +124,23 @@ const SendTransaction = () => {
     [allAccounts, connectionKey],
   );
 
-  const sign = useCallback(async () => {
-    await dispatch(signTransaction({ operationId }));
+  const signCallback = useCallback(async () => {
+    await dispatch(sign({ operationId }));
     window.close();
   }, [dispatch, operationId]);
 
-  const reject = useCallback(async () => {
-    await dispatch(rejectTransaction({ operationId }));
+  const rejectCallback = useCallback(async () => {
+    await dispatch(rejectSigning({ operationId }));
     window.close();
   }, [dispatch, operationId]);
 
   useEffect(() => {
     if (!account) {
-      reject();
+      rejectCallback();
       return;
     }
-    sign();
-  }, [sign, reject, account]);
+    signCallback();
+  }, [signCallback, rejectCallback, account]);
 
   const accountName = useMemo(
     () =>
@@ -164,7 +164,7 @@ const SendTransaction = () => {
           <br />
           to the LOBSTR app on your phone.
           <br />
-          Review the details and confirm to sign the transaction.
+          Review the details and confirm to sign the {signType}.
         </Description>
       </Wrapper>
       <AccountBlock>
@@ -178,4 +178,4 @@ const SendTransaction = () => {
   );
 };
 
-export default SendTransaction;
+export default SignModal;

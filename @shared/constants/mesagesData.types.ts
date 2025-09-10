@@ -13,20 +13,25 @@ export interface GrantAccessResolve {
     connectionKey: string;
 }
 
-export interface GrantAccessData extends RequestAccessData, GrantAccessResolve {}
+export interface GrantAccessData
+    extends RequestAccessData,
+        GrantAccessResolve {}
 
 // SIGN TRANSACTION MESSAGES
 
 export interface RequestSignData extends RequestWithOperation {
     connectionKey: string;
+    signType: "transaction" | "message";
 }
 
 export interface RequestSignAdditional {
-    transactionXdr: string;
+    dataToSign: string;
     connectionKey: string;
     domain: string;
+    signType: "transaction" | "message";
 }
 
 export interface SignRequestResolve {
-    signedTransaction: string;
+    signedData: string;
+    signerAddress: string;
 }

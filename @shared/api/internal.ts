@@ -92,22 +92,22 @@ export const grantAccess = async (data: GrantAccessData): Promise<void> => {
   }
 };
 
-export const signTransaction = async (data: RequestWithOperation): Promise<void> => {
+export const sign = async (data: RequestWithOperation): Promise<void> => {
   try {
     await sendMessageToBackground({
       data,
-      type: SERVICE_TYPES.SIGN_TRANSACTION,
+      type: SERVICE_TYPES.SIGN_INTERNAL,
     });
   } catch (e) {
     console.error(e);
   }
 };
 
-export const rejectTransaction = async (data: RequestWithOperation): Promise<void> => {
+export const rejectSigning = async (data: RequestWithOperation): Promise<void> => {
   try {
     await sendMessageToBackground({
       data,
-      type: SERVICE_TYPES.REJECT_TRANSACTION,
+      type: SERVICE_TYPES.REJECT_SIGNING,
     });
   } catch (e) {
     console.error(e);
