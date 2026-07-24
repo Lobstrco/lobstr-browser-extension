@@ -1,7 +1,12 @@
-# v1.0.0
+# v2.1.0
+
+- Changed the package license to Apache-2.0
+
+# v2.0.0
 
 ## New features
-- Added `signMessage` function for signing arbitrary messages with the LOBSTR extension
+- Added `signMessage` function for signing arbitrary messages with the LOBSTR extension; returns the signed message together with the signer address
+- Unified the signing protocol between the API and the extension, with API versioning for compatibility with future extension updates
 
 ## Build improvements
 - Disabled source maps generation for production builds to reduce bundle size

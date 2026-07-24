@@ -181,3 +181,7 @@ if (await window.lobstrSignerExtensionApi.isConnected()) {
   alert("User has LOBSTR extension installed!");
 }
 ```
+
+## License
+
+Apache-2.0. See [LICENSE](./LICENSE).

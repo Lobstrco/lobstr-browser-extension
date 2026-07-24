@@ -87,3 +87,13 @@ symlinks all the workspaces, so doing so will allow you to import files from the
 ### Dependencies
 
 Many dev dependencies (such as Typescript, linters, Webpack, etc.) have been moved to the root `package.json` to allow devs to upgrade these libraries all in one place.
+
+## License
+
+This repository uses split licensing:
+
+- The browser extension (`/extension`) is licensed under [GPL-3.0](./LICENSE).
+- The client-facing SDK (`/@lobstrco/signer-extension-api`), including the `/@shared` files
+  compiled into its published npm bundle, is licensed under
+  [Apache-2.0](./@lobstrco/signer-extension-api/LICENSE) and can be integrated into
+  applications under any license.
