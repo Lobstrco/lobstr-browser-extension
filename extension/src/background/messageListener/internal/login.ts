@@ -2,6 +2,11 @@ import { checkLogin } from "@shared/api/lobstr-api";
 import { updateSelectedConnection } from "../../helpers/updateSelectedConnection";
 import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
 import { getUpdatedAccounts } from "../../helpers/getUpdatedAccounts";
+import { normalizeError } from "@shared/helpers/errors";
+import {
+    accountAlreadyConnectedMessage,
+    ERROR_MESSAGES,
+} from "@shared/constants/errorMessages";
 
 export async function login(uuid: string) {
     try {
@@ -36,10 +41,9 @@ export async function login(uuid: string) {
                 account.connectionKey === connectionKey,
         );
         if (accountExists) {
-            return { error: `${connectionKey} is already exists` };
+            return { error: accountAlreadyConnectedMessage(connectionKey) };
         }
 
-        // Update selected account to a new account
         const selectedConnection = await updateSelectedConnection(
             updatedAccounts,
             connectionKey,
@@ -52,6 +56,8 @@ export async function login(uuid: string) {
             selectedConnection,
         };
     } catch (e) {
-        return { error: e };
+        console.error(e);
+        // a fulfilled value the popup reads, so it must be the declared `error: string`
+        return { error: normalizeError(e, ERROR_MESSAGES.LOGIN_FAILED) };
     }
 }

@@ -14,11 +14,7 @@ interface Msg {
 }
 
 export const sendMessageToContentScript = (msg: Msg): Promise<any> => {
-  /* 
-    In the case of multiple calls coming in sequentially, we use this MESSAGE_ID to make sure we're responding to
-    the appropriate message sender. Otherwise, we can run into race conditions where we simply resolve all 
-    sent messages with the first thing that comes back.
-  */
+  // correlates the reply; without it concurrent calls all resolve with the first one back
   const MESSAGE_ID = Date.now() + Math.random();
 
   window.postMessage(
@@ -28,14 +24,7 @@ export const sendMessageToContentScript = (msg: Msg): Promise<any> => {
   return new Promise((resolve) => {
     let requestTimeout: number | NodeJS.Timeout = 0;
 
-    /*
-      In the case that LOBSTR is not installed at all, any messages to
-      background from @lobstrco/signer-extension-api will hang forever and not respond in any way.
-      This is especially a problem for the isConnected method, because this is
-      likely to be called in a situation where LOBSTR isn't installed.
-      To prevent this, we add a timeout to automatically resolve in the event
-      LOBSTR doesn't respond in a timely fashion to this method.
-    */
+    // nothing answers when LOBSTR is absent, and this is what pages call to find out
     if (msg.type === EXTERNAL_SERVICE_TYPES.REQUEST_CONNECTION_STATUS) {
       requestTimeout = setTimeout(() => {
         resolve({ isConnected: false });
@@ -44,11 +33,9 @@ export const sendMessageToContentScript = (msg: Msg): Promise<any> => {
     }
 
     const messageListener = (event: { source: any; data: any }) => {
-      // We only accept messages from ourselves
       if (event.source !== window) return;
-      // Only respond to messages tagged as being from our content script
       if (event?.data?.source !== EXTERNAL_MSG_RESPONSE) return;
-      // Only respond to messages that this instance of sendMessageToContentScript sent
+      // post `messageId`, read `messagedId` — never rename one side, they ship separately
       if (event?.data?.messagedId !== MESSAGE_ID) return;
 
       resolve(event.data);

@@ -25,13 +25,14 @@ describe("getPublicKey", () => {
   describe("fail case", () => {
     const TEST_ERROR = "Error!";
 
-    it("throws an error", () => {
+    it("throws an error", async () => {
       jest
         .spyOn(apiExternal, "requestPublicKey", null)
         .mockImplementation(() => {
           throw TEST_ERROR;
         });
-      expect(getPublicKey()).rejects.toBe(TEST_ERROR);
+      // `.rejects` must be awaited or the assertion never runs
+      await expect(getPublicKey()).rejects.toBe(TEST_ERROR);
     });
   });
 });

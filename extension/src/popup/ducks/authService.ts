@@ -13,6 +13,8 @@ import {
   toggleHiddenMode as toggleHiddenModeService,
 } from "@shared/api/internal";
 import { Account, ErrorMessage } from "@shared/constants/types";
+import { normalizeError } from "@shared/helpers/errors";
+import { ERROR_MESSAGES } from "@shared/constants/errorMessages";
 
 interface InitialState {
   allAccounts: Account[];
@@ -47,9 +49,11 @@ export const loadState = createAsyncThunk<
   try {
     res = await loadStateService();
     return res;
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
-    return thunkApi.rejectWithValue({ errorMessage: e.message });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(e, ERROR_MESSAGES.LOAD_STATE_FAILED),
+    });
   }
 });
 
@@ -61,13 +65,18 @@ export const login = createAsyncThunk<
   let res;
   try {
     res = await loginService(uuid);
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
-    return thunkApi.rejectWithValue({ errorMessage: e.message });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(e, ERROR_MESSAGES.LOGIN_FAILED),
+    });
   }
 
+  // keep bare truthiness: narrowing lets a serialised Error ({}) fulfil with no accounts
   if (res.error) {
-    return thunkApi.rejectWithValue({ errorMessage: res.error });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(res.error, ERROR_MESSAGES.LOGIN_FAILED),
+    });
   }
 
   return res;
@@ -81,9 +90,11 @@ export const selectConnection = createAsyncThunk<
   let res;
   try {
     res = await selectConnectionService(connectionKey);
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
-    return thunkApi.rejectWithValue({ errorMessage: e.message });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(e, ERROR_MESSAGES.SELECT_CONNECTION_FAILED),
+    });
   }
 
   return res;
@@ -97,9 +108,11 @@ export const logout = createAsyncThunk<
   let res;
   try {
     res = await logoutService(connectionKey);
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
-    return thunkApi.rejectWithValue({ errorMessage: e.message });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(e, ERROR_MESSAGES.LOGOUT_FAILED),
+    });
   }
 
   return res;
@@ -113,9 +126,11 @@ export const toggleHiddenMode = createAsyncThunk<
   let res;
   try {
     res = await toggleHiddenModeService();
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
-    return thunkApi.rejectWithValue({ errorMessage: e.message });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(e, ERROR_MESSAGES.TOGGLE_HIDDEN_MODE_FAILED),
+    });
   }
 
   return res;

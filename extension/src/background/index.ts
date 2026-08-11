@@ -7,7 +7,7 @@ import {
 import { ROUTES } from "popup/constants/routes";
 import { PopupWindow } from "./helpers/popupWindow";
 import { externalApiMessageListener } from "./messageListener/external";
-import { MessageError } from "./helpers/messageError";
+import { MessageError } from "@shared/helpers/errors";
 import { internalMessagesListener } from "./messageListener/internal";
 
 export const initContentScriptMessageListener = () => {
@@ -25,6 +25,7 @@ export const initExtensionMessageListener = () => {
     if (request.type in SERVICE_TYPES) {
       return internalMessagesListener(request);
     } else if (request.type in EXTERNAL_SERVICE_TYPES) {
+      // resolved as data, not rejected: the polyfill flattens rejections it cannot read
       return externalApiMessageListener(request, sender)
           .catch((error: unknown) =>
             error instanceof MessageError ?

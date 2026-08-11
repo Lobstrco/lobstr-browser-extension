@@ -5,13 +5,14 @@ import {
   EXTERNAL_MSG_RESPONSE,
   EXTERNAL_SERVICE_TYPES,
 } from "@shared/constants/services";
+import { ERROR_MESSAGES } from "@shared/constants/errorMessages";
 
 export const redirectMessagesToBackground = () => {
   window.addEventListener(
     "message",
     async (event) => {
+      // `messageId` in, `messagedId` out — never rename one side, the npm SDK ships separately
       const messagedId = event?.data?.messageId || 0;
-      // We only accept messages from ourselves
       if (event.source !== window) return;
 
       // only allow external LOBSTR API calls unless we're in Dev Mode
@@ -21,19 +22,18 @@ export const redirectMessagesToBackground = () => {
       ) {
         return;
       }
-      // Only respond to messages tagged as being from LOBSTR API
       if (!event.data.source || event.data.source !== EXTERNAL_MSG_REQUEST)
         return;
-      // Forward the message on to Background
-      let res = { error: "Unable to send message to extension" };
+      let res = { error: ERROR_MESSAGES.MESSAGING_UNAVAILABLE };
       try {
-        res = await browser.runtime.sendMessage(event.data);
+        // without `??` an undefined reply wipes the fallback and reads downstream as success
+        res = (await browser.runtime.sendMessage(event.data)) ?? res;
       } catch (e) {
         console.error(e);
       }
-      // Send the response back to LOBSTR API
+      // `res` spreads first so it cannot overwrite the routing fields the page matches on
       window.postMessage(
-        { source: EXTERNAL_MSG_RESPONSE, messagedId, ...res },
+        { ...res, source: EXTERNAL_MSG_RESPONSE, messagedId },
         window.location.origin,
       );
     },

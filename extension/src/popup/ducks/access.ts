@@ -24,10 +24,3 @@ export const rejectSigning = createAsyncThunk(
   "rejectSigning",
   internalRejectSigning,
 );
-
-// Basically an alias for metrics purposes
-export const rejectBlob = createAsyncThunk("rejectBlob", internalRejectAccess);
-export const rejectAuthEntry = createAsyncThunk(
-  "rejectAuthEntry",
-  internalRejectAccess,
-);

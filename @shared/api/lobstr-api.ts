@@ -6,6 +6,7 @@ import {
     LumenQuote,
 } from "@shared/constants/types";
 import { TX_STATUS } from "@shared/constants/services";
+import { ERROR_MESSAGES } from "@shared/constants/errorMessages";
 import { deleteRequest, get, post } from "./helpers/request";
 
 const API_URL = "https://lobstr.co";
@@ -56,14 +57,14 @@ export const updateConnection = (
 export const checkLogin = (
     uuid: string,
     resolver?: (value: any) => any,
-    rejecter?: (value: any) => any,
+    rejecter?: (reason: string) => any,
     attempt: number = 0,
 ): Promise<any> => {
     if (attempt === 0) {
         clearTimeout(timeout);
     }
     if (attempt > LOGIN_POLLING_ATTEMPTS) {
-        return rejecter ? rejecter({ error: "Connection timeout" }) : null;
+        return rejecter ? rejecter(ERROR_MESSAGES.CONNECTION_TIMEOUT) : null;
     }
     return get(`${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`)
         .then((data: GetConnectionResponse) => {
@@ -131,7 +132,9 @@ export const signWithLobstr = (
         .then((res) => res.id)
         .then((id) => checkSignStatus(uuid, id, signType))
         .then((resolveData) =>
-            resolveData ? resolveData : Promise.reject("User declined access"),
+            resolveData
+                ? resolveData
+                : Promise.reject(ERROR_MESSAGES.USER_DECLINED_ACCESS),
         );
 };
 
@@ -157,7 +160,7 @@ function requestMessageSign(dataToSign: string, uuid: string, domain: string) {
 
 const PollingMap = new Map<
     string,
-    { timeout: any; rejecter: (value: any) => any }
+    { timeout: any; rejecter: (reason: string) => any }
 >();
 const TX_POLLING_INTERVAL = 5000;
 const TX_POLLING_ATTEMPTS = 720; // 1 hour
@@ -167,7 +170,8 @@ const checkSignStatus = (
     id: string,
     signType: "transaction" | "message",
     resolver?: (value: any) => any,
-    rejecter?: (value: any) => any,
+    // `string`, not `any`: one rejection shape, so internal/sign.ts cannot flatten it
+    rejecter?: (reason: string) => any,
     attempt: number = 0,
 ): Promise<any> => {
     const urlPath = signType === "transaction" ? "transactions" : "messages";
@@ -176,14 +180,14 @@ const checkSignStatus = (
     ).then((response) => {
         if (attempt === 0 && PollingMap.has(uuid)) {
             clearTimeout(PollingMap.get(uuid)!.timeout);
-            PollingMap.get(uuid)!.rejecter({
-                error: "Transaction polling aborted",
-            });
+            PollingMap.get(uuid)!.rejecter(
+                ERROR_MESSAGES.SIGN_REQUEST_SUPERSEDED,
+            );
         }
         if (attempt > TX_POLLING_ATTEMPTS) {
             PollingMap.delete(uuid);
             return rejecter
-                ? rejecter({ error: "Transaction polling timeout" })
+                ? rejecter(ERROR_MESSAGES.SIGN_REQUEST_TIMEOUT)
                 : null;
         }
         if (response.state === TX_STATUS.signed && resolver) {

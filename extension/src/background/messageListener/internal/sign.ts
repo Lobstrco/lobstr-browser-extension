@@ -6,7 +6,11 @@ import {
 } from "@shared/constants/mesagesData.types";
 import { signWithLobstr } from "@shared/api/lobstr-api";
 import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
-import { MessageError } from "../../helpers/messageError";
+import { MessageError, normalizeError } from "@shared/helpers/errors";
+import {
+    ERROR_MESSAGES,
+    missingOperationMessage,
+} from "@shared/constants/errorMessages";
 import { Account } from "@shared/constants/types";
 
 export async function sign(data: RequestWithOperation) {
@@ -16,7 +20,7 @@ export async function sign(data: RequestWithOperation) {
         RequestSignAdditional
     >(operationId);
     if (!operation) {
-        console.error(`Missing operation for sign with id ${operationId}`);
+        console.error(missingOperationMessage("sign", operationId));
         return;
     }
     const { dataToSign, connectionKey, domain, signType } =
@@ -38,8 +42,11 @@ export async function sign(data: RequestWithOperation) {
         const signerAddress = await _getSignerAddress(connectionKey);
         operation.resolve({ signedData, signerAddress });
     } catch (e) {
-        const message: string = typeof e === "string" ? e : "Sign failed";
-        operation.reject(new MessageError(message));
+        // the only place the real cause survives — the dApp gets a safe summary
+        console.error(e);
+        operation.reject(
+            new MessageError(normalizeError(e, ERROR_MESSAGES.SIGN_FAILED)),
+        );
     }
 }
 

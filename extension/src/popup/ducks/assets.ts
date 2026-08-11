@@ -5,16 +5,17 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import { loadCachedAssets, processNewAssets } from "@shared/api/internal";
+import { normalizeError } from "@shared/helpers/errors";
+import { ERROR_MESSAGES } from "@shared/constants/errorMessages";
 
+// no `error` field on purpose: nothing ever rendered it
 interface InitialState {
   assets: Partial<Asset>[];
   isLoadedFromCache: boolean;
-  error: string;
 }
 
 const initialState: InitialState = {
   assets: [],
-  error: "",
   isLoadedFromCache: false,
 };
 
@@ -27,9 +28,11 @@ export const loadCachedAssetsInfo = createAsyncThunk<
   try {
     res = await loadCachedAssets();
     return res;
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
-    return thunkApi.rejectWithValue({ errorMessage: e.message });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(e, ERROR_MESSAGES.ASSETS_LOAD_FAILED),
+    });
   }
 });
 
@@ -42,9 +45,11 @@ export const processNew = createAsyncThunk<
   try {
     res = await processNewAssets(assets);
     return res;
-  } catch (e: any) {
+  } catch (e) {
     console.error(e);
-    return thunkApi.rejectWithValue({ errorMessage: e.message });
+    return thunkApi.rejectWithValue({
+      errorMessage: normalizeError(e, ERROR_MESSAGES.ASSETS_LOAD_FAILED),
+    });
   }
 });
 const assetsSlice = createSlice({
@@ -61,28 +66,12 @@ const assetsSlice = createSlice({
         isLoadedFromCache: true,
       };
     });
-    builder.addCase(loadCachedAssetsInfo.rejected, (state, action) => {
-      const { errorMessage } = action.payload || { errorMessage: "" };
-
-      return {
-        ...state,
-        error: errorMessage,
-      };
-    });
     builder.addCase(processNew.fulfilled, (state, action) => {
       const { assets } = action.payload;
 
       return {
         ...state,
         assets,
-      };
-    });
-    builder.addCase(processNew.rejected, (state, action) => {
-      const { errorMessage } = action.payload || { errorMessage: "" };
-
-      return {
-        ...state,
-        error: errorMessage,
       };
     });
   },
