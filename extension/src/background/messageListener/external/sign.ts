@@ -21,6 +21,10 @@ export function sign(
             if (!connectionKey) {
                 return operation.reject(new MessageError(ERROR_MESSAGES.CONNECTION_KEY_MISSING));
             }
+            // caught here so an empty payload never opens a window the user has to dismiss
+            if (!dataToSign) {
+                return operation.reject(new MessageError(ERROR_MESSAGES.DATA_TO_SIGN_MISSING));
+            }
             const domain = getUrlHostname(url);
             operation.setAdditionalData({ dataToSign, connectionKey, domain, signType });
             new PopupWindow(ROUTES.signModal, { connectionKey, operationId: operation.id, signType })

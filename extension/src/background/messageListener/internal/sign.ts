@@ -32,10 +32,6 @@ export async function sign(data: RequestWithConnection) {
     }
     const { dataToSign, connectionKey, domain, signType } = additionalData;
 
-    if (!dataToSign) {
-        return;
-    }
-
     await _updateLastActivityTime(connectionKey);
 
     try {
@@ -56,7 +52,16 @@ export async function sign(data: RequestWithConnection) {
     }
 }
 
+// a failure here only skews wallet ordering, so it must never abort a signature
 async function _updateLastActivityTime(connectionKey: string): Promise<void> {
+    try {
+        await _writeLastActivityTime(connectionKey);
+    } catch (e) {
+        console.error(e);
+    }
+}
+
+async function _writeLastActivityTime(connectionKey: string): Promise<void> {
     const allAccounts: Account[] = await getAllAccounts();
     const updatedAccounts: Account[] = allAccounts.map((account: Account) =>
         account.connectionKey === connectionKey

@@ -5,6 +5,7 @@ export const ERROR_MESSAGES = {
     /** One string for both "closed the prompt" and "rejected in the app" — same dApp reaction. */
     USER_DECLINED_ACCESS: "User declined access",
     CONNECTION_KEY_MISSING: "The connection key is missing",
+    DATA_TO_SIGN_MISSING: "The data to sign is missing",
     POPUP_OPEN_FAILED: "Couldn't open access prompt",
     ACCOUNT_NOT_FOUND: "Associated account not found",
     /** Deliberately vague — keeps HTTP and server text out of third-party dApp UIs. */

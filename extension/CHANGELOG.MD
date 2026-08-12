@@ -68,6 +68,8 @@
 - Login errors are stored as a message string rather than a serialised error object
 - A sign request no longer hangs forever when the confirmation window fails to open. The handler meant to report this was unreachable, so the request was never answered
 - A confirmation window that outlived a background restart can no longer act on an unrelated request. Operation ids came from an in-memory counter that restarted at 1, while the window kept the id it was opened with
+- A request with nothing to sign is rejected straight away and no longer opens a confirmation window the user then has to dismiss. It used to be reported as if the user had declined
+- A failure to record the wallet's last activity time no longer aborts the signature. Wallet ordering may be briefly out of date instead, and corrects itself on the next signature
 
 ## Code refactoring
 - Unified error handling: one normalizer turns any thrown value into a message, and every user-facing error string now lives in a single module
@@ -81,4 +83,4 @@
 ## Build and tests
 - Fixed the test suite, which failed to run because it referenced an API removed two versions earlier
 - Excluded worktree checkouts from the Jest module map
-- Added the first unit tests for error normalization, async operations, the confirmation window, operation ids and signing rejection
+- Added the first unit tests for error normalization, async operations, the confirmation window, operation ids and both sides of the signing flow
