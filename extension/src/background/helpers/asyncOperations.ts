@@ -9,7 +9,7 @@ const runHook = (hook: () => void): void => {
 };
 
 class AsyncOperationsStoreSingleton {
-    private store: Map<number, AsyncOperation<any, any>> = new Map();
+    private store: Map<string, AsyncOperation<any, any>> = new Map();
 
     create<Result, Additional>(): AsyncOperation<Result, Additional> {
         const operation = new AsyncOperation<Result, Additional>();
@@ -18,11 +18,11 @@ class AsyncOperationsStoreSingleton {
         return operation;
     }
 
-    get<Result = unknown, Additional = null>(id: number): AsyncOperation<Result, Additional> | null {
+    get<Result = unknown, Additional = null>(id: string): AsyncOperation<Result, Additional> | null {
         return this.store.get(id) || null;
     }
 
-    delete(id: number): void {
+    delete(id: string): void {
         this.store.delete(id);
     }
 }
@@ -30,7 +30,7 @@ class AsyncOperationsStoreSingleton {
 export const AsyncOperationsStore = new AsyncOperationsStoreSingleton();
 
 export class AsyncOperation<Result = unknown, Additional = null> {
-    get id(): number {
+    get id(): string {
         return this._id;
     }
 
@@ -38,7 +38,7 @@ export class AsyncOperation<Result = unknown, Additional = null> {
         return this.operation;
     }
 
-    private _id: number = getUniqueId();
+    private _id: string = getUniqueId();
     private settled: boolean = false;
     private additionalData: Additional | null = null;
     private operation: Promise<Result>;

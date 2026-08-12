@@ -1,7 +1,12 @@
 // GRANT ACCESS MESSAGES
 
 export interface RequestWithOperation {
-    operationId: number;
+    operationId: string;
+}
+
+/** Carries the connection so a handler can confirm the message targets its own operation. */
+export interface RequestWithConnection extends RequestWithOperation {
+    connectionKey: string;
 }
 
 export interface RequestAccessData extends RequestWithOperation {

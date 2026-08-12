@@ -31,5 +31,11 @@ export const accountAlreadyConnectedMessage = (connectionKey: string): string =>
 /** Console-only: an operation id arrived that the store no longer holds. */
 export const missingOperationMessage = (
     action: string,
-    operationId: number,
+    operationId: string,
 ): string => `Missing operation for ${action} with id ${operationId}`;
+
+/** Console-only: a message targeted an operation belonging to another connection. */
+export const mismatchedConnectionMessage = (
+    action: string,
+    operationId: string,
+): string => `Connection mismatch for ${action} with id ${operationId}`;

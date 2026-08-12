@@ -13,7 +13,11 @@ import { SERVICE_TYPES } from "../constants/services";
 
 import { sendMessageToBackground } from "./helpers/extensionMessaging";
 import { get, post } from "./helpers/request";
-import { GrantAccessData, RequestWithOperation } from "../constants/mesagesData.types";
+import {
+  GrantAccessData,
+  RequestWithConnection,
+  RequestWithOperation,
+} from "../constants/mesagesData.types";
 
 export const loadState = (): Promise<{
   allAccounts: Account[];
@@ -92,7 +96,7 @@ export const grantAccess = async (data: GrantAccessData): Promise<void> => {
   }
 };
 
-export const sign = async (data: RequestWithOperation): Promise<void> => {
+export const sign = async (data: RequestWithConnection): Promise<void> => {
   try {
     await sendMessageToBackground({
       data,
@@ -103,7 +107,7 @@ export const sign = async (data: RequestWithOperation): Promise<void> => {
   }
 };
 
-export const rejectSigning = async (data: RequestWithOperation): Promise<void> => {
+export const rejectSigning = async (data: RequestWithConnection): Promise<void> => {
   try {
     await sendMessageToBackground({
       data,

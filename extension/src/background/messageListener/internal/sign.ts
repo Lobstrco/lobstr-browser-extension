@@ -1,7 +1,7 @@
 import { AsyncOperationsStore } from "../../helpers/asyncOperations";
 import {
     RequestSignAdditional,
-    RequestWithOperation,
+    RequestWithConnection,
     SignRequestResolve,
 } from "@shared/constants/mesagesData.types";
 import { signWithLobstr } from "@shared/api/lobstr-api";
@@ -9,11 +9,12 @@ import { saveAllAccounts, getAllAccounts } from "../../helpers/account";
 import { MessageError, normalizeError } from "@shared/helpers/errors";
 import {
     ERROR_MESSAGES,
+    mismatchedConnectionMessage,
     missingOperationMessage,
 } from "@shared/constants/errorMessages";
 import { Account } from "@shared/constants/types";
 
-export async function sign(data: RequestWithOperation) {
+export async function sign(data: RequestWithConnection) {
     const { operationId } = data;
     const operation = AsyncOperationsStore.get<
         SignRequestResolve,
@@ -23,8 +24,13 @@ export async function sign(data: RequestWithOperation) {
         console.error(missingOperationMessage("sign", operationId));
         return;
     }
-    const { dataToSign, connectionKey, domain, signType } =
-        operation.getAdditionalData()!;
+    const additionalData = operation.getAdditionalData();
+    // a popup outliving a worker restart must not drive somebody else's operation
+    if (!additionalData || additionalData.connectionKey !== data.connectionKey) {
+        console.error(mismatchedConnectionMessage("sign", operationId));
+        return;
+    }
+    const { dataToSign, connectionKey, domain, signType } = additionalData;
 
     if (!dataToSign) {
         return;

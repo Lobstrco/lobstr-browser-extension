@@ -125,14 +125,14 @@ const SignModal = () => {
   );
 
   const signCallback = useCallback(async () => {
-    await dispatch(sign({ operationId }));
+    await dispatch(sign({ operationId, connectionKey }));
     window.close();
-  }, [dispatch, operationId]);
+  }, [dispatch, operationId, connectionKey]);
 
   const rejectCallback = useCallback(async () => {
-    await dispatch(rejectSigning({ operationId }));
+    await dispatch(rejectSigning({ operationId, connectionKey }));
     window.close();
-  }, [dispatch, operationId]);
+  }, [dispatch, operationId, connectionKey]);
 
   useEffect(() => {
     if (!account) {
