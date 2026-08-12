@@ -1,13 +1,19 @@
 import { getUniqueId } from "./uniqueId";
 
+const runHook = (hook: () => void): void => {
+    try {
+        hook();
+    } catch (e) {
+        console.error(e);
+    }
+};
+
 class AsyncOperationsStoreSingleton {
     private store: Map<number, AsyncOperation<any, any>> = new Map();
 
     create<Result, Additional>(): AsyncOperation<Result, Additional> {
         const operation = new AsyncOperation<Result, Additional>();
-        operation
-            .onResolve(() => this.delete(operation.id))
-            .onError(() => this.delete(operation.id));
+        operation.onSettled(() => this.delete(operation.id));
         this.store.set(operation.id, operation);
         return operation;
     }
@@ -33,10 +39,12 @@ export class AsyncOperation<Result = unknown, Additional = null> {
     }
 
     private _id: number = getUniqueId();
+    private settled: boolean = false;
     private additionalData: Additional | null = null;
     private operation: Promise<Result>;
     private resolveCallback!: (arg: Result) => void;
     private rejectCallback!: (error: unknown) => void;
+    private readonly settleHooks: Set<() => void> = new Set();
 
     constructor() {
         this.operation = new Promise((resolve, reject) => {
@@ -46,11 +54,29 @@ export class AsyncOperation<Result = unknown, Additional = null> {
     }
 
     resolve(data: Result): void {
+        if (this.settled) {
+            return;
+        }
+        this.settle();
         this.resolveCallback(data);
     }
 
     reject(reason: unknown): void {
+        if (this.settled) {
+            return;
+        }
+        this.settle();
         this.rejectCallback(reason);
+    }
+
+    /** Cleanup that runs exactly once on every terminal path; fires at once if already settled. */
+    onSettled(callback: () => void): this {
+        if (this.settled) {
+            runHook(callback);
+            return this;
+        }
+        this.settleHooks.add(callback);
+        return this;
     }
 
     setAdditionalData(data: Additional): this {
@@ -67,6 +93,7 @@ export class AsyncOperation<Result = unknown, Additional = null> {
         return this;
     }
 
+    // extends the promise chain, so registration order matters — use onSettled for cleanup
     onResolve(callback: (result: Result) => void): this {
         this.operation = this.operation.then((result: Result) => {
             callback(result);
@@ -75,11 +102,10 @@ export class AsyncOperation<Result = unknown, Additional = null> {
         return this;
     }
 
-    onError(callback: (error: unknown) => void): this {
-        this.operation = this.operation.catch((error: unknown) => {
-            callback(error);
-            return Promise.reject(error);
-        });
-        return this;
+    private settle(): void {
+        this.settled = true;
+        const hooks = Array.from(this.settleHooks);
+        this.settleHooks.clear();
+        hooks.forEach(runHook);
     }
 }

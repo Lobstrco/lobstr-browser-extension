@@ -59,3 +59,22 @@
 # v1.3.2
 - BREAKING: Completely removed Redux store and session management infrastructure. Updated message listeners to directly handle account operations without Redux dependencies
 - Refactor: Simplified session state management by removing unused properties and selectors
+
+# v1.4.1
+
+## Bug fixes
+- Sign requests now report why they failed. A request replaced by a newer one, a polling timeout, and a network error were all reported as "Sign failed" and could not be told apart
+- A response with no payload from the background is no longer treated as success. Previously `signTransaction` could resolve with `undefined` instead of rejecting
+- Login errors are stored as a message string rather than a serialised error object
+
+## Code refactoring
+- Unified error handling: one normalizer turns any thrown value into a message, and every user-facing error string now lives in a single module
+- Moved `MessageError` to `@shared` so the messaging wire format sits next to the code that reads it
+- The content script no longer lets a response overwrite the fields used to route it back to the page
+- `AsyncOperation` gained a single settlement hook that runs cleanup exactly once on every terminal path, replacing two hooks that extended the promise chain
+- Removed error state that was written but never read
+
+## Build and tests
+- Fixed the test suite, which failed to run because it referenced an API removed two versions earlier
+- Excluded worktree checkouts from the Jest module map
+- Added the first unit tests for error normalization and async operations
