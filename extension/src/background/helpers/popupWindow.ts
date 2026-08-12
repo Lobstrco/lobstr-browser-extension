@@ -26,21 +26,10 @@ export class PopupWindow {
 
     constructor(private readonly route: ROUTES, private readonly data?: unknown) {
         this.$window = this.openWindow();
-        this.$window.then((window: Windows.Window) => {
-            browser.windows.onRemoved.addListener((removed) => {
-                if (window.id === removed) {
-                    this.windowRemoved = true;
-                    Array.from(this.onRemovedCallbacks).forEach(cb => cb());
-                    this.onRemovedCallbacks.clear();
-                }
-            });
-            // Is this possible??? Leave for compatibility
-            if (!window) {
-                this.unableToOpen = true;
-                Array.from(this.unableToOpenCallbacks).forEach(cb => cb());
-                this.unableToOpenCallbacks.clear();
-            }
-        });
+        // derived chain, not a reassignment — `window` must keep rejecting for its callers
+        this.$window
+            .then((window: Windows.Window) => this.watchForRemoval(window))
+            .catch(() => this.markUnableToOpen());
     }
 
     onRemoved(callback: () => void): this {
@@ -59,6 +48,25 @@ export class PopupWindow {
             this.unableToOpenCallbacks.add(callback);
         }
         return this;
+    }
+
+    private watchForRemoval(window: Windows.Window): void {
+        const listener = (removed: number) => {
+            if (window.id !== removed) {
+                return;
+            }
+            browser.windows.onRemoved.removeListener(listener);
+            this.windowRemoved = true;
+            Array.from(this.onRemovedCallbacks).forEach(cb => cb());
+            this.onRemovedCallbacks.clear();
+        };
+        browser.windows.onRemoved.addListener(listener);
+    }
+
+    private markUnableToOpen(): void {
+        this.unableToOpen = true;
+        Array.from(this.unableToOpenCallbacks).forEach(cb => cb());
+        this.unableToOpenCallbacks.clear();
     }
 
     private async openWindow(): Promise<Windows.Window> {

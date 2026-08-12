@@ -66,6 +66,7 @@
 - Sign requests now report why they failed. A request replaced by a newer one, a polling timeout, and a network error were all reported as "Sign failed" and could not be told apart
 - A response with no payload from the background is no longer treated as success. Previously `signTransaction` could resolve with `undefined` instead of rejecting
 - Login errors are stored as a message string rather than a serialised error object
+- A sign request no longer hangs forever when the confirmation window fails to open. The handler meant to report this was unreachable, so the request was never answered
 
 ## Code refactoring
 - Unified error handling: one normalizer turns any thrown value into a message, and every user-facing error string now lives in a single module
@@ -73,8 +74,9 @@
 - The content script no longer lets a response overwrite the fields used to route it back to the page
 - `AsyncOperation` gained a single settlement hook that runs cleanup exactly once on every terminal path, replacing two hooks that extended the promise chain
 - Removed error state that was written but never read
+- Each confirmation window now drops its close listener once it closes, instead of leaving one behind for the lifetime of the background script
 
 ## Build and tests
 - Fixed the test suite, which failed to run because it referenced an API removed two versions earlier
 - Excluded worktree checkouts from the Jest module map
-- Added the first unit tests for error normalization and async operations
+- Added the first unit tests for error normalization, async operations and the confirmation window
