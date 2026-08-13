@@ -6,8 +6,7 @@ import { loadState } from "./loadState";
 import { toggleAppHiddenMode } from "./toggleAppHiddenMode";
 import { getLumenQuotes } from "./getLumenQuotes";
 import { loadCachedAssets } from "./loadCachedAssets";
-import { sign } from "./sign";
-import { rejectSigning } from "./rejectSigning";
+import { loadSignPromptState } from "./loadSignPromptState";
 import { processNewAssets } from "./processNewAssets";
 import { login } from "./login";
 import { selectNewConnection } from "./selectNewConnection";
@@ -26,10 +25,8 @@ export function internalMessagesListener(request: Request) {
             return rejectAccess(request.data);
         case SERVICE_TYPES.LOAD_STATE:
             return loadState();
-        case SERVICE_TYPES.SIGN_INTERNAL:
-            return sign(request.data);
-        case SERVICE_TYPES.REJECT_SIGNING:
-            return rejectSigning(request.data);
+        case SERVICE_TYPES.LOAD_SIGN_PROMPT_STATE:
+            return loadSignPromptState();
         case SERVICE_TYPES.PROCESS_NEW_ASSETS:
             return processNewAssets(request.assets);
         case SERVICE_TYPES.SELECT_CONNECTION:

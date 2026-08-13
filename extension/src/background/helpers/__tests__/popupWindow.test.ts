@@ -9,12 +9,16 @@ jest.mock("webextension-polyfill", () => ({
             create: jest.fn(),
             getCurrent: jest.fn(),
             onRemoved: { addListener: jest.fn(), removeListener: jest.fn() },
+            update: jest.fn(),
+            remove: jest.fn(),
         },
     },
 }));
 
 const windows = browser.windows as jest.Mocked<typeof browser.windows> & {
     onRemoved: { addListener: jest.Mock; removeListener: jest.Mock };
+    update: jest.Mock;
+    remove: jest.Mock;
 };
 
 // lets the constructor's promise chain run to completion
@@ -111,5 +115,43 @@ describe("PopupWindow removal", () => {
         await flush();
 
         expect(unableToOpen).not.toHaveBeenCalled();
+    });
+});
+
+describe("PopupWindow focus and close", () => {
+    it("brings its own window forward", async () => {
+        const popup = new PopupWindow(ROUTES.signModal);
+        await flush();
+
+        await popup.focus();
+
+        expect(windows.update).toHaveBeenCalledWith(42, { focused: true });
+    });
+
+    it("closes its own window", async () => {
+        const popup = new PopupWindow(ROUTES.signModal);
+        await flush();
+
+        await popup.close();
+
+        expect(windows.remove).toHaveBeenCalledWith(42);
+    });
+
+    it("does not throw when the window is already gone", async () => {
+        windows.remove.mockRejectedValue(new Error("no such window"));
+        const popup = new PopupWindow(ROUTES.signModal);
+        await flush();
+
+        await expect(popup.close()).resolves.toBeUndefined();
+    });
+
+    it("does not throw when the window never opened", async () => {
+        windows.create.mockRejectedValue(new Error("no window for you"));
+        const popup = new PopupWindow(ROUTES.signModal);
+        popup.window.catch(() => undefined);
+        await flush();
+
+        await expect(popup.focus()).resolves.toBeUndefined();
+        expect(windows.update).not.toHaveBeenCalled();
     });
 });

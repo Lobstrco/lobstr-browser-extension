@@ -4,11 +4,6 @@ export interface RequestWithOperation {
     operationId: string;
 }
 
-/** Carries the connection so a handler can confirm the message targets its own operation. */
-export interface RequestWithConnection extends RequestWithOperation {
-    connectionKey: string;
-}
-
 export interface RequestAccessData extends RequestWithOperation {
     url: string;
 }
@@ -24,16 +19,23 @@ export interface GrantAccessData
 
 // SIGN TRANSACTION MESSAGES
 
-export interface RequestSignData extends RequestWithOperation {
-    connectionKey: string;
-    signType: "transaction" | "message";
-}
-
 export interface RequestSignAdditional {
     dataToSign: string;
     connectionKey: string;
     domain: string;
     signType: "transaction" | "message";
+}
+
+export interface PendingSignRequest {
+    connectionKey: string;
+    signType: "transaction" | "message";
+}
+
+/** Everything the shared prompt shows: what is waiting, and what is already done. */
+export interface SignPromptState {
+    /** Oldest first; the first entry is the one being signed right now. */
+    requests: PendingSignRequest[];
+    signed: number;
 }
 
 export interface SignRequestResolve {

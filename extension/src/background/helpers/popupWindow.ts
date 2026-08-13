@@ -50,6 +50,29 @@ export class PopupWindow {
         return this;
     }
 
+    /** Brings an already-open window forward; a window that is gone is not an error. */
+    async focus(): Promise<void> {
+        try {
+            const { id } = await this.$window;
+            if (id !== undefined) {
+                await browser.windows.update(id, { focused: true });
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
+    async close(): Promise<void> {
+        try {
+            const { id } = await this.$window;
+            if (id !== undefined) {
+                await browser.windows.remove(id);
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    }
+
     private watchForRemoval(window: Windows.Window): void {
         const listener = (removed: number) => {
             if (window.id !== removed) {

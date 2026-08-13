@@ -45,6 +45,7 @@ export class AsyncOperation<Result = unknown, Additional = null> {
 
     private _id: string = getUniqueId();
     private settled: boolean = false;
+    private resolved: boolean = false;
     private additionalData: Additional | null = null;
     private operation: Promise<Result>;
     private resolveCallback!: (arg: Result) => void;
@@ -59,10 +60,16 @@ export class AsyncOperation<Result = unknown, Additional = null> {
         });
     }
 
+    /** Lets a settle hook tell success from failure without extending the chain. */
+    get isResolved(): boolean {
+        return this.resolved;
+    }
+
     resolve(data: Result): void {
         if (this.settled) {
             return;
         }
+        this.resolved = true;
         this.settle();
         this.resolveCallback(data);
     }

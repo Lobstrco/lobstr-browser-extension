@@ -35,9 +35,3 @@ export const missingOperationMessage = (
     action: string,
     operationId: string,
 ): string => `Missing operation for ${action} with id ${operationId}`;
-
-/** Console-only: a message targeted an operation belonging to another connection. */
-export const mismatchedConnectionMessage = (
-    action: string,
-    operationId: string,
-): string => `Connection mismatch for ${action} with id ${operationId}`;

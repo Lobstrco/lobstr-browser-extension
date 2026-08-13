@@ -15,8 +15,8 @@ import { sendMessageToBackground } from "./helpers/extensionMessaging";
 import { get, post } from "./helpers/request";
 import {
   GrantAccessData,
-  RequestWithConnection,
   RequestWithOperation,
+  SignPromptState,
 } from "../constants/mesagesData.types";
 
 export const loadState = (): Promise<{
@@ -96,27 +96,10 @@ export const grantAccess = async (data: GrantAccessData): Promise<void> => {
   }
 };
 
-export const sign = async (data: RequestWithConnection): Promise<void> => {
-  try {
-    await sendMessageToBackground({
-      data,
-      type: SERVICE_TYPES.SIGN_INTERNAL,
-    });
-  } catch (e) {
-    console.error(e);
-  }
-};
-
-export const rejectSigning = async (data: RequestWithConnection): Promise<void> => {
-  try {
-    await sendMessageToBackground({
-      data,
-      type: SERVICE_TYPES.REJECT_SIGNING,
-    });
-  } catch (e) {
-    console.error(e);
-  }
-};
+export const loadSignPromptState = (): Promise<SignPromptState> =>
+  sendMessageToBackground({
+    type: SERVICE_TYPES.LOAD_SIGN_PROMPT_STATE,
+  }) as unknown as Promise<SignPromptState>;
 
 export const loadCachedAssets = (): Promise<{
   assets: Asset[];

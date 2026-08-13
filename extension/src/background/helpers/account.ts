@@ -16,6 +16,13 @@ export const saveAllAccounts = async (allAccounts: Account[]) => {
   await LocalStorage.setItem(ALL_ACCOUNTS, allAccounts);
 };
 
+export const findAccount = async (
+  connectionKey: string,
+): Promise<Account | undefined> => {
+  const allAccounts: Account[] = await getAllAccounts();
+  return allAccounts.find((account) => account.connectionKey === connectionKey);
+};
+
 export const getApplicationId = async () =>
   (await LocalStorage.getItem(APP_ID)) || "";
 
