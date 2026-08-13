@@ -12,7 +12,7 @@ import { processNewAssets } from "./processNewAssets";
 import { login } from "./login";
 import { selectNewConnection } from "./selectNewConnection";
 import { logout } from "./logout";
-import { cancelLoginPolling } from "./cancelLoginPolling";
+import { cancelLoginPolling } from "@shared/api/lobstr-api";
 
 export function internalMessagesListener(request: Request) {
     switch (request.type) {

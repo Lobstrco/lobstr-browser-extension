@@ -30,6 +30,7 @@ import Ios from "popup/assets/ios.svg";
 import Android from "popup/assets/android.svg";
 import BackIcon from "popup/assets/icon-back.svg";
 import { cancelLoginPolling } from "@shared/api/internal";
+import { ERROR_MESSAGES } from "@shared/constants/errorMessages";
 
 const Wrapper = styled.div`
   ${WrapperStyles};
@@ -135,9 +136,14 @@ const Connect = () => {
   }, [uuid, dispatch]);
 
   useEffect(() => {
-    if (error) {
+    if (!error) {
+      return;
+    }
+    dispatch(clearApiError());
+    // a cancellation we asked for ourselves is no reason to burn the current code;
+    // minting one here would cancel the poll we just started and loop forever
+    if (error !== ERROR_MESSAGES.LOGIN_CANCELLED) {
       setUuid(uuidv4());
-      dispatch(clearApiError());
     }
   }, [dispatch, error]);
 

@@ -6,10 +6,15 @@ function checkStatus(response: Response) {
   const { status, statusText } = response;
   const error: any = new Error(`${status}: ${statusText}`);
   error.response = response;
-  return response.json().then((errorData) => {
-    error.data = errorData;
-    throw error;
-  });
+  return response
+    .json()
+    // the body is optional detail; failing to parse it must not replace the
+    // status-carrying error with a SyntaxError
+    .catch(() => undefined)
+    .then((errorData) => {
+      error.data = errorData;
+      throw error;
+    });
 }
 
 function request(method: string, url: string, options: any) {

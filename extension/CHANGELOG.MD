@@ -70,6 +70,10 @@
 - A confirmation window that outlived a background restart can no longer act on an unrelated request. Operation ids came from an in-memory counter that restarted at 1, while the window kept the id it was opened with
 - A request with nothing to sign is rejected straight away and no longer opens a confirmation window the user then has to dismiss. It used to be reported as if the user had declined
 - A failure to record the wallet's last activity time no longer aborts the signature. Wallet ordering may be briefly out of date instead, and corrects itself on the next signature
+- Two sign requests from the same page no longer cancel each other. Status polling was tracked per connection, so starting a second request aborted the first
+- A dropped connection while waiting for the wallet no longer leaves the request hanging. A failed poll was never caught and nothing settled the request, and the one-hour limit could not be reached because it was only checked after a successful poll. Polling now survives about a minute of trouble before giving up
+- Closing the confirmation prompt now stops the polling. It used to keep asking the server for up to an hour, so a signature confirmed on the phone afterwards was thrown away
+- An error response whose body is not JSON keeps its status code. It used to be replaced by a parsing error, which hid the status from everything that inspects it
 
 ## Code refactoring
 - Unified error handling: one normalizer turns any thrown value into a message, and every user-facing error string now lives in a single module
@@ -79,8 +83,11 @@
 - Removed error state that was written but never read
 - Each confirmation window now drops its close listener once it closes, instead of leaving one behind for the lifetime of the background script
 - Signing messages carry the connection they belong to, and the handlers refuse anything addressed to a different one
+- Both polling loops are plain loops instead of functions rescheduling themselves, and share one `delay` helper. Requests are cancelled through the operation itself, so every way a request can end also stops its polling
+- Failed requests are retried only when retrying can help; a rejected connection or a bad address now fails immediately instead of being retried for a quarter of a minute
+- Removed a handler that only forwarded a call to another function
 
 ## Build and tests
 - Fixed the test suite, which failed to run because it referenced an API removed two versions earlier
 - Excluded worktree checkouts from the Jest module map
-- Added the first unit tests for error normalization, async operations, the confirmation window, operation ids and both sides of the signing flow
+- Added the first unit tests for error normalization, async operations, the confirmation window, operation ids, both sides of the signing flow, both polling loops and the HTTP error shape

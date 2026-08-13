@@ -40,6 +40,7 @@ export async function sign(data: RequestWithConnection) {
             connectionKey,
             domain,
             signType,
+            operation.signal,
         );
         const signerAddress = await _getSignerAddress(connectionKey);
         operation.resolve({ signedData, signerAddress });
@@ -55,21 +56,17 @@ export async function sign(data: RequestWithConnection) {
 // a failure here only skews wallet ordering, so it must never abort a signature
 async function _updateLastActivityTime(connectionKey: string): Promise<void> {
     try {
-        await _writeLastActivityTime(connectionKey);
+        const allAccounts: Account[] = await getAllAccounts();
+        const updatedAccounts: Account[] = allAccounts.map((account: Account) =>
+            account.connectionKey === connectionKey
+                ? { ...account, lastActivityTime: Date.now() }
+                : account,
+        );
+
+        await saveAllAccounts(updatedAccounts);
     } catch (e) {
         console.error(e);
     }
-}
-
-async function _writeLastActivityTime(connectionKey: string): Promise<void> {
-    const allAccounts: Account[] = await getAllAccounts();
-    const updatedAccounts: Account[] = allAccounts.map((account: Account) =>
-        account.connectionKey === connectionKey
-            ? { ...account, lastActivityTime: Date.now() }
-            : account,
-    );
-
-    await saveAllAccounts(updatedAccounts);
 }
 
 async function _getSignerAddress(connectionKey: string): Promise<string> {

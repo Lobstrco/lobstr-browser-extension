@@ -10,14 +10,15 @@ export const ERROR_MESSAGES = {
     ACCOUNT_NOT_FOUND: "Associated account not found",
     /** Deliberately vague — keeps HTTP and server text out of third-party dApp UIs. */
     SIGN_FAILED: "Sign failed",
-    /** These two were masked as SIGN_FAILED and never reached a dApp, so the wording was free to change. */
-    SIGN_REQUEST_SUPERSEDED: "Signing request was replaced by a newer one",
     SIGN_REQUEST_TIMEOUT: "Signing request timed out",
     MESSAGING_UNAVAILABLE: "Unable to send message to extension",
 
     // popup-only
 
     CONNECTION_TIMEOUT: "Connection timeout",
+    /** Aborting only ever follows settlement, so this never overtakes the real outcome. */
+    SIGN_REQUEST_CANCELLED: "Signing request was cancelled",
+    LOGIN_CANCELLED: "Login was cancelled",
     LOAD_STATE_FAILED: "Couldn't load the extension state",
     LOGIN_FAILED: "Couldn't connect the wallet",
     LOGOUT_FAILED: "Couldn't disconnect the wallet",

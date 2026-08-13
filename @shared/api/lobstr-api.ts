@@ -7,6 +7,7 @@ import {
 } from "@shared/constants/types";
 import { TX_STATUS } from "@shared/constants/services";
 import { ERROR_MESSAGES } from "@shared/constants/errorMessages";
+import { delay } from "@shared/helpers/delay";
 import { deleteRequest, get, post } from "./helpers/request";
 
 const API_URL = "https://lobstr.co";
@@ -14,15 +15,23 @@ const API_URL = "https://lobstr.co";
 const LOGIN_POLLING_INTERVAL = 5000;
 const LOGIN_POLLING_ATTEMPTS = 60; // 5 minutes
 
-let timeout: any;
+let loginPolling: AbortController | null = null;
 
-// Function to cancel login polling
 export const cancelLoginPolling = () => {
-    if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-    }
+    loginPolling?.abort();
+    loginPolling = null;
 };
+
+const toConnection = (
+    data: GetConnectionResponse,
+): Omit<Account, "lastActivityTime"> => ({
+    publicKey: data.public_key,
+    connectionKey: data.connection_key,
+    federation: data.federation_address,
+    nickname: data.nickname,
+    userAgent: data.user_agent,
+    currency: data.currency,
+});
 
 export const updateConnection = (
     connection: Account,
@@ -30,214 +39,154 @@ export const updateConnection = (
     get(
         `${API_URL}/api/v1/lobstr-extension/connections/${connection.connectionKey}/`,
     )
-        .then((res) => {
-            const {
-                connection_key,
-                public_key,
-                federation_address,
-                nickname,
-                user_agent,
-                currency,
-            } = res;
-
-            return {
-                publicKey: public_key,
-                connectionKey: connection_key,
-                federation: federation_address,
-                nickname,
-                userAgent: user_agent,
-                currency,
-            };
-        })
+        .then(toConnection)
         .catch((error) => {
             const status = error?.response?.status;
             return status === 404 ? null : connection;
         });
 
-export const checkLogin = (
-    uuid: string,
-    resolver?: (value: any) => any,
-    rejecter?: (reason: string) => any,
-    attempt: number = 0,
-): Promise<any> => {
-    if (attempt === 0) {
-        clearTimeout(timeout);
-    }
-    if (attempt > LOGIN_POLLING_ATTEMPTS) {
-        return rejecter ? rejecter(ERROR_MESSAGES.CONNECTION_TIMEOUT) : null;
-    }
-    return get(`${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`)
-        .then((data: GetConnectionResponse) => {
-            const {
-                connection_key,
-                public_key,
-                federation_address,
-                nickname,
-                user_agent,
-                currency,
-            } = data;
+export const checkLogin = async (uuid: string): Promise<Account> => {
+    // only one login poll at a time, so starting one ends whatever came before
+    cancelLoginPolling();
+    const controller = new AbortController();
+    loginPolling = controller;
+    const { signal } = controller;
+    const url = `${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`;
 
-            return resolver
-                ? resolver({
-                      publicKey: public_key,
-                      connectionKey: connection_key,
-                      federation: federation_address,
-                      nickname,
-                      userAgent: user_agent,
-                      lastActivityTime: Date.now(),
-                      currency,
-                  })
-                : {
-                      publicKey: public_key,
-                      connectionKey: connection_key,
-                      federation: federation_address,
-                      nickname,
-                      userAgent: user_agent,
-                      lastActivityTime: Date.now(),
-                      currency,
-                  };
-        })
-        .catch(() => {
-            if (resolver) {
-                timeout = setTimeout(
-                    () => checkLogin(uuid, resolver, rejecter, attempt + 1),
-                    LOGIN_POLLING_INTERVAL,
-                );
-                return;
+    try {
+        for (let attempt = 0; attempt <= LOGIN_POLLING_ATTEMPTS; attempt++) {
+            if (signal.aborted) {
+                throw ERROR_MESSAGES.LOGIN_CANCELLED;
             }
-
-            return new Promise((resolve, reject) => {
-                timeout = setTimeout(
-                    () => checkLogin(uuid, resolve, reject, attempt + 1),
-                    LOGIN_POLLING_INTERVAL,
-                );
-            });
-        });
+            try {
+                const data: GetConnectionResponse = await get(url, { signal });
+                return { ...toConnection(data), lastActivityTime: Date.now() };
+            } catch {
+                // the connection does not exist until the QR code is scanned,
+                // so any failure here is the normal "not yet" answer
+                if (signal.aborted) {
+                    throw ERROR_MESSAGES.LOGIN_CANCELLED;
+                }
+            }
+            if (attempt < LOGIN_POLLING_ATTEMPTS) {
+                await delay(LOGIN_POLLING_INTERVAL, signal);
+            }
+        }
+        throw ERROR_MESSAGES.CONNECTION_TIMEOUT;
+    } finally {
+        if (loginPolling === controller) {
+            loginPolling = null;
+        }
+    }
 };
 
 export const logoutFromLobstr = (uuid: string) =>
     deleteRequest(`${API_URL}/api/v1/lobstr-extension/connections/${uuid}/`);
 
-export const signWithLobstr = (
+export const signWithLobstr = async (
     dataToSign: string,
     uuid: string,
     domain: string,
     signType: "transaction" | "message",
+    signal: AbortSignal,
 ): Promise<string> => {
     const request =
         signType === "transaction"
             ? requestTransactionSign
             : requestMessageSign;
-    return request(dataToSign, uuid, domain)
-        .then((res) => res.id)
-        .then((id) => checkSignStatus(uuid, id, signType))
-        .then((resolveData) =>
-            resolveData
-                ? resolveData
-                : Promise.reject(ERROR_MESSAGES.USER_DECLINED_ACCESS),
-        );
+    try {
+        const { id } = await request(dataToSign, uuid, domain, signal);
+        const resolveData = await checkSignStatus(uuid, id, signType, signal);
+        if (!resolveData) {
+            throw ERROR_MESSAGES.USER_DECLINED_ACCESS;
+        }
+        return resolveData;
+    } catch (e) {
+        // an aborted fetch rejects with a DOMException, which would be masked as "Sign failed"
+        throw signal.aborted ? ERROR_MESSAGES.SIGN_REQUEST_CANCELLED : e;
+    }
 };
 
 function requestTransactionSign(
     dataToSign: string,
     uuid: string,
     domain: string,
+    signal: AbortSignal,
 ) {
     const body = JSON.stringify({ xdr: dataToSign, action: "sign", domain });
     return post(
         `${API_URL}/api/v1/lobstr-extension/connections/${uuid}/transactions/`,
-        { body },
+        { body, signal },
     );
 }
 
-function requestMessageSign(dataToSign: string, uuid: string, domain: string) {
+function requestMessageSign(
+    dataToSign: string,
+    uuid: string,
+    domain: string,
+    signal: AbortSignal,
+) {
     const body = JSON.stringify({ message: dataToSign, domain });
     return post(
         `${API_URL}/api/v1/lobstr-extension/connections/${uuid}/messages/`,
-        { body },
+        { body, signal },
     );
 }
 
-const PollingMap = new Map<
-    string,
-    { timeout: any; rejecter: (reason: string) => any }
->();
 const TX_POLLING_INTERVAL = 5000;
 const TX_POLLING_ATTEMPTS = 720; // 1 hour
+// budgeted against the hour-long wait: three tries would end it after ~15s of flaky network
+const MAX_CONSECUTIVE_FAILURES = 12;
 
-const checkSignStatus = (
+/** No status means the transport failed; those and 5xx are worth another attempt. */
+const isRetriable = (error: unknown): boolean => {
+    const status = (error as { response?: { status?: number } })?.response
+        ?.status;
+    return !status || status >= 500 || status === 408 || status === 429;
+};
+
+const checkSignStatus = async (
     uuid: string,
     id: string,
     signType: "transaction" | "message",
-    resolver?: (value: any) => any,
-    // `string`, not `any`: one rejection shape, so internal/sign.ts cannot flatten it
-    rejecter?: (reason: string) => any,
-    attempt: number = 0,
-): Promise<any> => {
+    signal: AbortSignal,
+): Promise<string> => {
     const urlPath = signType === "transaction" ? "transactions" : "messages";
-    return get(
-        `${API_URL}/api/v1/lobstr-extension/connections/${uuid}/${urlPath}/${id}/`,
-    ).then((response) => {
-        if (attempt === 0 && PollingMap.has(uuid)) {
-            clearTimeout(PollingMap.get(uuid)!.timeout);
-            PollingMap.get(uuid)!.rejecter(
-                ERROR_MESSAGES.SIGN_REQUEST_SUPERSEDED,
-            );
-        }
-        if (attempt > TX_POLLING_ATTEMPTS) {
-            PollingMap.delete(uuid);
-            return rejecter
-                ? rejecter(ERROR_MESSAGES.SIGN_REQUEST_TIMEOUT)
-                : null;
-        }
-        if (response.state === TX_STATUS.signed && resolver) {
-            PollingMap.delete(uuid);
-            const resolveData =
-                signType === "transaction" ? response.xdr : response.signature;
-            return resolver(resolveData);
-        }
-        if (response.state === TX_STATUS.rejected && resolver) {
-            PollingMap.delete(uuid);
-            return resolver("");
-        }
+    const url = `${API_URL}/api/v1/lobstr-extension/connections/${uuid}/${urlPath}/${id}/`;
+    let consecutiveFailures = 0;
 
-        if (resolver && rejecter) {
-            PollingMap.set(uuid, {
-                timeout: setTimeout(
-                    () =>
-                        checkSignStatus(
-                            uuid,
-                            id,
-                            signType,
-                            resolver,
-                            rejecter,
-                            attempt + 1,
-                        ),
-                    TX_POLLING_INTERVAL,
-                ),
-                rejecter,
-            });
-            return;
+    for (let attempt = 0; attempt <= TX_POLLING_ATTEMPTS; attempt++) {
+        if (signal.aborted) {
+            throw ERROR_MESSAGES.SIGN_REQUEST_CANCELLED;
         }
-
-        return new Promise((resolve, reject) =>
-            PollingMap.set(uuid, {
-                timeout: setTimeout(
-                    () =>
-                        checkSignStatus(
-                            uuid,
-                            id,
-                            signType,
-                            resolve,
-                            reject,
-                            attempt + 1,
-                        ),
-                    TX_POLLING_INTERVAL,
-                ),
-                rejecter: reject,
-            }),
-        );
-    });
+        try {
+            const response = await get(url, { signal });
+            consecutiveFailures = 0;
+            if (response.state === TX_STATUS.signed) {
+                return signType === "transaction"
+                    ? response.xdr
+                    : response.signature;
+            }
+            // an empty result is turned into "user declined" by the caller
+            if (response.state === TX_STATUS.rejected) {
+                return "";
+            }
+        } catch (e) {
+            consecutiveFailures += 1;
+            if (
+                signal.aborted ||
+                !isRetriable(e) ||
+                consecutiveFailures >= MAX_CONSECUTIVE_FAILURES
+            ) {
+                throw e;
+            }
+        }
+        // returns early on abort; the check at the top of the loop ends it
+        if (attempt < TX_POLLING_ATTEMPTS) {
+            await delay(TX_POLLING_INTERVAL, signal);
+        }
+    }
+    throw ERROR_MESSAGES.SIGN_REQUEST_TIMEOUT;
 };
 
 export const getLastLumenQuotes = (): Promise<LumenQuote[]> =>

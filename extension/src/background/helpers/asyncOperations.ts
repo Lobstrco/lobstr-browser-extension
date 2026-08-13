@@ -38,6 +38,11 @@ export class AsyncOperation<Result = unknown, Additional = null> {
         return this.operation;
     }
 
+    /** Aborted as soon as the operation settles, whatever ended it. */
+    get signal(): AbortSignal {
+        return this.controller.signal;
+    }
+
     private _id: string = getUniqueId();
     private settled: boolean = false;
     private additionalData: Additional | null = null;
@@ -45,6 +50,7 @@ export class AsyncOperation<Result = unknown, Additional = null> {
     private resolveCallback!: (arg: Result) => void;
     private rejectCallback!: (error: unknown) => void;
     private readonly settleHooks: Set<() => void> = new Set();
+    private readonly controller: AbortController = new AbortController();
 
     constructor() {
         this.operation = new Promise((resolve, reject) => {
@@ -104,6 +110,7 @@ export class AsyncOperation<Result = unknown, Additional = null> {
 
     private settle(): void {
         this.settled = true;
+        this.controller.abort();
         const hooks = Array.from(this.settleHooks);
         this.settleHooks.clear();
         hooks.forEach(runHook);
