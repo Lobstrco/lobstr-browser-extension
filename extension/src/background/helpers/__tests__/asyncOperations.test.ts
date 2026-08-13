@@ -73,6 +73,25 @@ describe("AsyncOperation settlement", () => {
         expect(survivor).toHaveBeenCalledTimes(1);
     });
 
+    it("aborts its signal when it resolves", () => {
+        // this is what stops the status polling once a request is over
+        const operation = new AsyncOperation<string>();
+        expect(operation.signal.aborted).toBe(false);
+
+        operation.resolve("done");
+
+        expect(operation.signal.aborted).toBe(true);
+    });
+
+    it("aborts its signal when it rejects", () => {
+        const operation = new AsyncOperation<string>();
+        operation.promise.catch(() => undefined);
+
+        operation.reject("nope");
+
+        expect(operation.signal.aborted).toBe(true);
+    });
+
     it("still runs onResolve callbacks", async () => {
         const operation = new AsyncOperation<string>();
         const onResolve = jest.fn();

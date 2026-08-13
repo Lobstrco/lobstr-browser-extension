@@ -52,6 +52,26 @@ describe("checkLogin", () => {
         expect(mockedGet).toHaveBeenCalledTimes(1);
     });
 
+    it("stamps the account with an activity time", async () => {
+        // wallet ordering sorts on this; undefined turns the comparator into NaN
+        mockedGet.mockResolvedValue(connection);
+
+        const account = await checkLogin("wallet-a");
+
+        expect(typeof account.lastActivityTime).toBe("number");
+        expect(account.lastActivityTime).toBeGreaterThan(0);
+    });
+
+    it("gives up once the connection never appears", async () => {
+        mockedGet.mockRejectedValue(new Error("404: not found"));
+
+        const assertion = expect(checkLogin("wallet-a")).rejects.toBe(
+            ERROR_MESSAGES.CONNECTION_TIMEOUT,
+        );
+        await tick(70);
+        await assertion;
+    });
+
     it("keeps polling while the connection does not exist yet", async () => {
         // a failed request is the normal "QR code not scanned yet" answer
         mockedGet

@@ -90,4 +90,5 @@
 ## Build and tests
 - Fixed the test suite, which failed to run because it referenced an API removed two versions earlier
 - Excluded worktree checkouts from the Jest module map
-- Added the first unit tests for error normalization, async operations, the confirmation window, operation ids, both sides of the signing flow, both polling loops and the HTTP error shape
+- Added the first unit tests for error normalization, async operations, the confirmation window, operation ids, both sides of the signing flow, both polling loops, connection refresh and the HTTP error shape
+- Closed the coverage gaps the tests were leaving: cancelling a request now provably stops its polling, both polling timeouts are pinned to the message they report, and refreshing a connection is checked for every outcome — a revoked wallet is dropped, an unreachable server never costs one

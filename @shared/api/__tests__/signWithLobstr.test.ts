@@ -109,6 +109,16 @@ describe("signWithLobstr", () => {
         await assertion;
     });
 
+    it("gives up once the wallet never answers", async () => {
+        mockedGet.mockResolvedValue({ state: "pending" });
+
+        const assertion = expect(sign(new AbortController().signal)).rejects.toBe(
+            ERROR_MESSAGES.SIGN_REQUEST_TIMEOUT,
+        );
+        await tick(730);
+        await assertion;
+    });
+
     it("does not retry a failure that cannot resolve itself", async () => {
         mockedGet.mockRejectedValue(httpError(404));
 
