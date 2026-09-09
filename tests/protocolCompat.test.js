@@ -1,4 +1,10 @@
-import * as protocol from "@lobstrco/signer-extension-api/protocol";
+import { createRequire } from "node:module";
+import { describe, expect, test } from "vitest";
+
+// Node resolves the package's own name through its `exports` map, as a CommonJS consumer would
+const protocol = createRequire(import.meta.url)(
+    "@lobstrco/signer-extension-api/protocol",
+);
 
 // exact on purpose: an export added or dropped fails here until this list says so
 const RUNTIME_NAMES = [

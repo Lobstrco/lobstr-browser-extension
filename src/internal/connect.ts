@@ -17,9 +17,8 @@ interface ConnectedWalletReply {
 export const connectWallet = async (
     requested?: NetworkId,
 ): Promise<ConnectedWalletReply> => {
-    const { publicKey, connectionKey, network } = await requestPublicKey(
-        requested,
-    );
+    const { publicKey, connectionKey, network } =
+        await requestPublicKey(requested);
 
     // `requestPublicKey` already resolved the answer; only the ask can still be absent
     if (network !== networkOrLegacy(requested)) {

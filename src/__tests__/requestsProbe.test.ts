@@ -1,3 +1,4 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
     requestSupportedNetworks,
     sign,
@@ -8,15 +9,15 @@ import { EXTERNAL_SERVICE_TYPES } from "../protocol/messages";
 import { API_VERSION } from "../protocol/api-version";
 import { NETWORK } from "../networks";
 
-jest.mock("../internal/transport", () => ({
-    sendMessageToContentScript: jest.fn(),
+vi.mock("../internal/transport", () => ({
+    sendMessageToContentScript: vi.fn(),
 }));
 
-const mockedSend = sendMessageToContentScript as jest.Mock;
+const mockedSend = vi.mocked(sendMessageToContentScript);
 
 const sentMessage = () => mockedSend.mock.calls[0][0];
 
-beforeEach(() => jest.resetAllMocks());
+beforeEach(() => vi.resetAllMocks());
 
 describe("network threading of the requests to the extension", () => {
     it.each([

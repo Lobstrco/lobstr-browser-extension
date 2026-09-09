@@ -1,11 +1,12 @@
-import fs from "fs";
-import path from "path";
+import { describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 
 describe("the published network vocabulary", () => {
     it("imports nothing, so the protocol entry can re-export it without closing a cycle", () => {
         // a cycle resolves to undefined, and an unnamed network means Stellar forever
         const source = fs.readFileSync(
-            path.join(__dirname, "..", "networks.ts"),
+            path.join(import.meta.dirname, "..", "networks.ts"),
             "utf8",
         );
 

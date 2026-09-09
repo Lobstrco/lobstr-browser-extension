@@ -47,9 +47,11 @@ The package ships three builds and picks the right one for you:
 |---|---|
 | `import` (native ESM, bundlers, Node ESM) | `build/index.mjs` |
 | `require` (CommonJS) | `build/index.cjs` |
-| `<script src="...">` | `build/index.min.js` (UMD) |
+| `<script src="...">` | `build/index.min.js` (defines `window.lobstrExtensionApi`) |
 
-Named imports work in all three, including native ESM in Node.
+Named imports work in all three, including native ESM in Node. The `<script>` file opens with its
+own `"use strict"` directive, so load it as its own script rather than concatenating it ahead of
+others.
 
 #### Protocol vocabulary
 
@@ -357,15 +359,18 @@ Three things to know:
 
 ## Developing
 
+Node 22.13 or newer.
+
 ```
 npm ci
-npm test            # builds first: the Node suite reads the packed output in build/
+npm test            # builds first: the Node suite reads the built output in build/
 npm run verify:types
 ```
 
-`npm run build` produces `build/`; `npm run lint`, `npm run format:check` and
-`npm run typecheck` are what CI runs. Publishing is manual: `npm publish` builds through
-`prepack` and ships only what `files` in package.json lists.
+`npm run build` bundles with esbuild and emits the declarations with `tsc`; `npm run lint`,
+`npm run format:check` and `npm run typecheck` are what CI runs, and `npm run test:watch`
+keeps the tests running. Publishing is manual: `npm publish` builds through `prepack` and
+ships only what `files` in package.json lists.
 
 ## License
 

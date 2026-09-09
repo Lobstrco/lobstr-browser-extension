@@ -1,18 +1,19 @@
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { requestPublicKey, sign } from "../internal/requests";
 import { sendMessageToContentScript } from "../internal/transport";
 
-jest.mock("../internal/transport", () => ({
-    sendMessageToContentScript: jest.fn(),
+vi.mock("../internal/transport", () => ({
+    sendMessageToContentScript: vi.fn(),
 }));
 
-const mockedSend = sendMessageToContentScript as jest.Mock;
+const mockedSend = vi.mocked(sendMessageToContentScript);
 
 const calls: [string, () => Promise<unknown>][] = [
     ["requestPublicKey", () => requestPublicKey()],
     ["sign", () => sign("xdr", "key", "transaction")],
 ];
 
-beforeEach(() => jest.resetAllMocks());
+beforeEach(() => vi.resetAllMocks());
 
 describe("what a dApp catches", () => {
     it.each(calls)(

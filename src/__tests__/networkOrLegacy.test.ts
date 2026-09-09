@@ -1,3 +1,4 @@
+import { describe, expect, it } from "vitest";
 import { NETWORK, networkOrLegacy } from "../networks";
 
 const UNKNOWN = "bitcoin";
@@ -9,7 +10,7 @@ describe("reading a network off the wire", () => {
     });
 
     it.each([[NETWORK.ripple], [UNKNOWN], [""]])(
-        "leaves %p exactly as it arrived",
+        "leaves %j exactly as it arrived",
         (value) => {
             // a present value is the sender's, and rewriting it names the wrong chain
             expect(networkOrLegacy(value)).toBe(value);

@@ -1,7 +1,10 @@
+import { describe, expect, it, vi } from "vitest";
 import * as requests from "../internal/requests";
 import { signTransaction } from "../signTransaction";
 import { getPublicKey } from "../getPublicKey";
 import { NETWORK } from "../networks";
+
+vi.mock("../internal/requests", { spy: true });
 
 describe("signTransaction", () => {
     describe("success case", () => {
@@ -12,13 +15,13 @@ describe("signTransaction", () => {
 
         // call getPublicKey to test saving connectionKey
         // `network` is resolved by the call being mocked here, so it is never absent
-        jest.spyOn(requests, "requestPublicKey", null).mockReturnValue({
+        vi.mocked(requests.requestPublicKey).mockReturnValue({
             connectionKey: TEST_CONNECTION_KEY,
             network: NETWORK.stellar,
         });
         getPublicKey();
 
-        jest.spyOn(requests, "sign", null).mockReturnValue(
+        vi.mocked(requests.sign).mockReturnValue(
             Promise.resolve({
                 signedData: SIGNED_XDR,
                 signerAddress: TEST_SIGNER_ADDRESS,
@@ -29,9 +32,11 @@ describe("signTransaction", () => {
             const transaction = await signTransaction(INITIAL_XDR);
             expect(transaction).toBe(SIGNED_XDR);
         });
-        it("called with xdr, connectionKey and signType", () => {
+        it("called with xdr, connectionKey and signType", async () => {
+            await signTransaction(INITIAL_XDR);
+
             // no network: a one-argument call is a Stellar call, permanently
-            expect(requests.sign).toBeCalledWith(
+            expect(requests.sign).toHaveBeenLastCalledWith(
                 INITIAL_XDR,
                 TEST_CONNECTION_KEY,
                 "transaction",
@@ -55,7 +60,7 @@ describe("signTransaction", () => {
     describe("fail case", () => {
         it("propagates whatever the transport rejects with", async () => {
             const TEST_ERROR = "Error!";
-            jest.spyOn(requests, "sign", null).mockImplementation(() => {
+            vi.mocked(requests.sign).mockImplementation(() => {
                 throw TEST_ERROR;
             });
             // the transport already shaped the rejection; this layer must not re-wrap it

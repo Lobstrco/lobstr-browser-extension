@@ -39,7 +39,7 @@ export const sign = async (
     signType: SignType,
     network?: NetworkId,
 ): Promise<{ signedData: string; signerAddress: string }> => {
-    let response = { signedData: "", error: "", signerAddress: "" };
+    let response: { signedData: string; signerAddress: string; error?: string };
     try {
         response = await sendMessageToContentScript({
             dataToSign,

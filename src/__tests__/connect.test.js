@@ -1,11 +1,15 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
 import * as requests from "../internal/requests";
 import { CONNECTION_STORAGE_KEY } from "../internal/connectionKey";
 import { ERROR_MESSAGES } from "../protocol/errors";
 import { NETWORK } from "../networks";
 import { getConnectedWallet } from "../getConnectedWallet";
 
+// the wallet answer is what these tests vary, so the request layer is spied, not the transport
+vi.mock("../internal/requests", { spy: true });
+
 const answer = (network) =>
-    jest.spyOn(requests, "requestPublicKey", null).mockResolvedValue({
+    vi.mocked(requests.requestPublicKey).mockResolvedValue({
         publicKey: "GWALLET",
         connectionKey: "the-key",
         network,
@@ -13,7 +17,7 @@ const answer = (network) =>
 
 describe("connecting a wallet", () => {
     afterEach(() => {
-        jest.restoreAllMocks();
+        vi.resetAllMocks();
         sessionStorage.clear();
     });
 
@@ -34,7 +38,7 @@ describe("connecting a wallet", () => {
         answer(NETWORK.stellar);
 
         // an Error, like every other business error: integrators compare `.message`;
-        // an Error argument makes Jest compare the message exactly, not by substring
+        // an Error argument makes the matcher compare the message exactly, not by substring
         await expect(
             getConnectedWallet({ network: NETWORK.ripple }),
         ).rejects.toThrow(new Error(ERROR_MESSAGES.NETWORK_MISMATCH));

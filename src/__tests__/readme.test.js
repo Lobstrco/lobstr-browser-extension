@@ -1,9 +1,13 @@
-const fs = require("fs");
-const path = require("path");
+import { describe, expect, it } from "vitest";
+import fs from "node:fs";
+import path from "node:path";
 
-const pkg = require("../../package.json");
+import pkg from "../../package.json";
 
-const README = fs.readFileSync(path.join(__dirname, "../../README.md"), "utf8");
+const README = fs.readFileSync(
+    path.join(import.meta.dirname, "..", "..", "README.md"),
+    "utf8",
+);
 
 // derived from the manifest, not hand-written: a host allow-list stays green on a 404ing path
 const servedBy = {

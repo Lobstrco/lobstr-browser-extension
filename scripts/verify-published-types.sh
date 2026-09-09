@@ -200,8 +200,25 @@ TS
 
 # what the types promise must also be there at runtime — the gap that shipped once
 cat > "$WORK/package.json" <<'JSON'
-{ "name": "smoke", "private": true }
+{ "name": "smoke", "private": true, "type": "module" }
 JSON
+
+# the ESM entry as Node-style resolution reads it: the default import is the function object
+# the .mjs exports, not the CommonJS namespace; the protocol entry has no default at all
+cat > "$WORK/esm-shape.ts" <<'TS'
+import signer from "@lobstrco/signer-extension-api";
+import * as protocol from "@lobstrco/signer-extension-api/protocol";
+// @ts-expect-error the protocol entry exports no default
+import protocolDefault from "@lobstrco/signer-extension-api/protocol";
+
+export const key: Promise<string> = signer.getPublicKey();
+// @ts-expect-error the enum is a named export, not a member of the default object
+export const notOnDefault = signer.NETWORK;
+// @ts-expect-error the default object does not nest itself
+export const noNesting = signer.default;
+export const version: number = protocol.API_VERSION.V3;
+export const unused = protocolDefault;
+TS
 
 cat > "$WORK/smoke.mjs" <<'JS'
 import assert from "node:assert";
@@ -214,8 +231,8 @@ import * as protoEsm from "@lobstrco/signer-extension-api/protocol";
 const require = createRequire(import.meta.url);
 const cjs = require("@lobstrco/signer-extension-api");
 const protoCjs = require("@lobstrco/signer-extension-api/protocol");
-// UMD picks its branch from what is in scope, and `require` gives it the CommonJS one.
-// A <script> tag has none of that, so only a bare context exercises the global cdnjs serves.
+// the <script> build is a plain IIFE that assigns one global, so only a bare
+// browser-like context shows what a page loading it from a CDN actually gets
 const browser = { console };
 browser.self = browser;
 browser.window = browser;
@@ -224,8 +241,8 @@ vm.runInContext(
   readFileSync("./node_modules/@lobstrco/signer-extension-api/build/index.min.js", "utf8"),
   browser,
 );
-const umd = browser.lobstrExtensionApi;
-assert.ok(umd, "the <script> build defines no window.lobstrExtensionApi");
+const script = browser.lobstrExtensionApi;
+assert.ok(script, "the <script> build defines no window.lobstrExtensionApi");
 
 const FUNCTIONS = [
   "getConnectedWallet", "getPublicKey", "getSupportedNetworks",
@@ -234,7 +251,7 @@ const FUNCTIONS = [
 // exact on purpose: an export added or dropped fails here until this list says so
 const NAMED = [...FUNCTIONS, "NETWORK", "isBrowser"].sort();
 
-for (const [kind, mod] of [["esm", esm], ["cjs", cjs], ["umd", umd]]) {
+for (const [kind, mod] of [["esm", esm], ["cjs", cjs], ["script", script]]) {
   const named = Object.keys(mod).filter((key) => key !== "default").sort();
   assert.deepEqual(named, NAMED, `${kind} exports ${named} not ${NAMED}`);
   assert.equal(mod.NETWORK.ripple, "ripple", `${kind} NETWORK is not the enum`);
@@ -244,7 +261,7 @@ for (const [kind, mod] of [["esm", esm], ["cjs", cjs], ["umd", umd]]) {
 }
 
 // the README documents the default export as carrying every function
-for (const [kind, fallback] of [["esm", signer], ["cjs", cjs.default], ["umd", umd.default]]) {
+for (const [kind, fallback] of [["esm", signer], ["cjs", cjs.default], ["script", script.default]]) {
   for (const name of FUNCTIONS) {
     assert.equal(typeof fallback[name], "function", `${kind} default.${name} is not callable`);
   }
@@ -296,11 +313,14 @@ check "runtime, from the packed tarball" bash -c "cd '$WORK' && node smoke.mjs" 
 # `node` resolution ignores `exports`: the root entry comes from `types`, the protocol entry
 # from `typesVersions` — what TypeScript 4 and `module: commonjs` consumers meet; `bundler`
 # reads the `exports` map instead. Both must reach both entries.
+# TypeScript 6 refuses `node` resolution without `ignoreDeprecations`, and 7 drops it: once
+# this repo moves to 7, run this pass with a pinned TypeScript 5 instead of removing it.
 for skip in false true; do
   cat > "$WORK/tsconfig.json" <<TS
 {
   "compilerOptions": {
     "target": "ES2020", "module": "ESNext", "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
     "strict": true, "noEmit": true, "skipLibCheck": $skip
   },
   "files": ["surface.ts", "protocol-surface.ts"]
@@ -318,6 +338,18 @@ TS
 }
 TS
   check "published surface + protocol, moduleResolution=bundler, skipLibCheck=$skip" "$TSC" -p "$WORK/tsconfig.json" || failed=1
+
+  # Node-style resolution reads the `import` condition's own `.d.mts`, so the ESM shape is typed as shipped
+  cat > "$WORK/tsconfig.json" <<TS
+{
+  "compilerOptions": {
+    "target": "ES2020", "module": "NodeNext", "moduleResolution": "NodeNext",
+    "strict": true, "noEmit": true, "skipLibCheck": $skip
+  },
+  "files": ["surface.ts", "protocol-surface.ts", "esm-shape.ts"]
+}
+TS
+  check "published surface + protocol + ESM shape, moduleResolution=nodenext, skipLibCheck=$skip" "$TSC" -p "$WORK/tsconfig.json" || failed=1
 done
 
 exit $failed

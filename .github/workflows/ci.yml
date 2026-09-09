@@ -38,12 +38,12 @@ jobs:
             - name: Types
               run: npm run typecheck
 
-            # before the tests: the node-compat suite imports the built package
+            # before the tests: the node suite imports the built package
             - name: Build
               run: npm run build
 
             - name: Tests
-              run: npm run test:ci
+              run: npx vitest run
 
             # packs the tarball and checks it from outside, the way a consumer meets it
             - name: Verify the published surface

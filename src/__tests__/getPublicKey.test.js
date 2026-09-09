@@ -1,7 +1,10 @@
+import { describe, expect, it, vi } from "vitest";
 import * as requests from "../internal/requests";
 import { CONNECTION_STORAGE_KEY } from "../internal/connectionKey";
 import { NETWORK } from "../networks";
 import { getPublicKey } from "../getPublicKey";
+
+vi.mock("../internal/requests", { spy: true });
 
 describe("getPublicKey", () => {
     describe("success case", () => {
@@ -9,7 +12,7 @@ describe("getPublicKey", () => {
         const TEST_CONNECTION_KEY = "xxxxx-xxxxxx-xxxxxx";
 
         // `network` is resolved by the call being mocked here, so it is never absent
-        jest.spyOn(requests, "requestPublicKey", null).mockReturnValue({
+        vi.mocked(requests.requestPublicKey).mockReturnValue({
             publicKey: TEST_PUBLIC_KEY,
             connectionKey: TEST_CONNECTION_KEY,
             network: NETWORK.stellar,
@@ -29,11 +32,9 @@ describe("getPublicKey", () => {
         const TEST_ERROR = "Error!";
 
         it("throws an error", async () => {
-            jest.spyOn(requests, "requestPublicKey", null).mockImplementation(
-                () => {
-                    throw TEST_ERROR;
-                },
-            );
+            vi.mocked(requests.requestPublicKey).mockImplementation(() => {
+                throw TEST_ERROR;
+            });
             // `.rejects` must be awaited or the assertion never runs
             await expect(getPublicKey()).rejects.toBe(TEST_ERROR);
         });

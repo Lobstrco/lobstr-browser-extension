@@ -21,10 +21,13 @@
   itself. No existing call changes meaning
 
 ## Build improvements
-- Ships separate ESM, CommonJS and UMD builds. Named imports now work at runtime in native
-  ESM, where previously they existed only in the type definitions
+- Ships separate ESM, CommonJS and `<script>` builds. Named imports now work at runtime in
+  native ESM, where previously they existed only in the type definitions. The `<script>` build
+  only defines `window.lobstrExtensionApi`; the 2.x UMD wrapper's AMD branch is gone
 - The publication guard type-checks the packed tarball from outside the repo and runs the
   installed package, so the types and the runtime cannot drift apart
+- The `import` condition ships its own ESM-flavoured declarations, so under Node-style
+  TypeScript resolution the default import is typed as what the ESM build exports
 - The SDK lives in its own repository, https://github.com/Lobstrco/lobstr-browser-extension,
   and the published declarations now carry their doc comments
 
