@@ -1,0 +1,5 @@
+build/
+assets/
+package-lock.json
+*.md
+*.MD
