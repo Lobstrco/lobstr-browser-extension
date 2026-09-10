@@ -28,14 +28,14 @@ export const requestPublicKey = async (
     // be published on purpose rather than ride along
     return {
         publicKey: response.publicKey || "",
-        connectionKey: response.connectionKey || "",
+        walletRef: response.walletRef || "",
         network: networkOrLegacy(response.network),
     };
 };
 
 export const sign = async (
     dataToSign: string,
-    connectionKey: string,
+    walletRef: string,
     signType: SignType,
     network?: NetworkId,
 ): Promise<{ signedData: string; signerAddress: string }> => {
@@ -43,7 +43,7 @@ export const sign = async (
     try {
         response = await sendMessageToContentScript({
             dataToSign,
-            connectionKey,
+            walletRef,
             signType,
             type: EXTERNAL_SERVICE_TYPES.SIGN,
             ...(network !== undefined ? { network } : {}),

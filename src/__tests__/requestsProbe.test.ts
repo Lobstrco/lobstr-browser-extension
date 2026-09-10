@@ -29,7 +29,7 @@ describe("network threading of the requests to the extension", () => {
             // "" compiles against the open `NetworkId`, and absent means Stellar
             mockedSend.mockResolvedValue({
                 publicKey: "G",
-                connectionKey: "k",
+                walletRef: "k",
             });
 
             await (call as any)("");
@@ -52,7 +52,7 @@ describe("network threading of the requests to the extension", () => {
 
         expect(sentMessage()).toEqual({
             dataToSign: "xdr",
-            connectionKey: "wallet-a",
+            walletRef: "wallet-a",
             signType: "transaction",
             type: EXTERNAL_SERVICE_TYPES.SIGN,
             version: API_VERSION.V2,
@@ -76,12 +76,12 @@ describe("network threading of the requests to the extension", () => {
     it("asks for access without a network when none was requested", async () => {
         mockedSend.mockResolvedValue({
             publicKey: "GABC",
-            connectionKey: "wallet-a",
+            walletRef: "wallet-a",
         });
 
         await expect(requestPublicKey()).resolves.toEqual({
             publicKey: "GABC",
-            connectionKey: "wallet-a",
+            walletRef: "wallet-a",
             network: NETWORK.stellar,
         });
         expect(sentMessage()).toEqual({
@@ -93,7 +93,7 @@ describe("network threading of the requests to the extension", () => {
     it("returns the network the extension granted", async () => {
         mockedSend.mockResolvedValue({
             publicKey: "rABC",
-            connectionKey: "wallet-r",
+            walletRef: "wallet-r",
             network: "ripple",
         });
 
@@ -132,7 +132,7 @@ describe("network threading of the requests to the extension", () => {
             source: "LOBSTR_EXTERNAL_MSG_RESPONSE",
             messagedId: 42,
             publicKey: "rAnchor",
-            connectionKey: "wallet-xrpl",
+            walletRef: "wallet-xrpl",
             network: "ripple",
             federation: "someone*lobstr.co",
             nickname: "Savings",
@@ -143,8 +143,17 @@ describe("network threading of the requests to the extension", () => {
 
         expect(connection).toEqual({
             publicKey: "rAnchor",
-            connectionKey: "wallet-xrpl",
+            walletRef: "wallet-xrpl",
             network: "ripple",
+        });
+    });
+
+    it("answers with nothing when the extension does not speak the field", async () => {
+        // an extension older than this build; the connect then fails on the mismatch
+        mockedSend.mockResolvedValue({ publicKey: "GABC", network: "stellar" });
+
+        await expect(requestPublicKey()).resolves.toMatchObject({
+            walletRef: "",
         });
     });
 });

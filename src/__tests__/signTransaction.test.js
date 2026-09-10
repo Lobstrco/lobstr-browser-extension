@@ -10,13 +10,13 @@ describe("signTransaction", () => {
     describe("success case", () => {
         const INITIAL_XDR = "unsigned";
         const SIGNED_XDR = "signed";
-        const TEST_CONNECTION_KEY = "xxxx-xxxx-xxxx";
+        const TEST_WALLET_REF = "xxxx-xxxx-xxxx";
         const TEST_SIGNER_ADDRESS = "GXXXXXXX....XXXXXXX";
 
-        // call getPublicKey to test saving connectionKey
+        // call getPublicKey to file the reference the sign then reads back
         // `network` is resolved by the call being mocked here, so it is never absent
         vi.mocked(requests.requestPublicKey).mockReturnValue({
-            connectionKey: TEST_CONNECTION_KEY,
+            walletRef: TEST_WALLET_REF,
             network: NETWORK.stellar,
         });
         getPublicKey();
@@ -32,13 +32,13 @@ describe("signTransaction", () => {
             const transaction = await signTransaction(INITIAL_XDR);
             expect(transaction).toBe(SIGNED_XDR);
         });
-        it("called with xdr, connectionKey and signType", async () => {
+        it("called with xdr, walletRef and signType", async () => {
             await signTransaction(INITIAL_XDR);
 
             // no network: a one-argument call is a Stellar call, permanently
             expect(requests.sign).toHaveBeenLastCalledWith(
                 INITIAL_XDR,
-                TEST_CONNECTION_KEY,
+                TEST_WALLET_REF,
                 "transaction",
                 undefined,
             );

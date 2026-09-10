@@ -1,7 +1,7 @@
 import { sign } from "./internal/requests";
 import { isBrowser } from "./internal/environment";
 import { NetworkOptions } from "./internal/types";
-import { readConnectionKey } from "./internal/connectionKey";
+import { readWalletRef } from "./internal/walletRef";
 
 /**
  * `transaction` is a string in the network's own grammar — a base64 envelope on
@@ -17,11 +17,11 @@ export const signTransaction = async (
         return Promise.resolve("");
     }
 
-    const connectionKey = readConnectionKey(options.network);
+    const walletRef = readWalletRef(options.network);
 
     const result = await sign(
         transaction,
-        connectionKey,
+        walletRef,
         "transaction",
         options.network,
     );

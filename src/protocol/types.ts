@@ -4,7 +4,8 @@ import type { NetworkId, SignType } from "../networks";
 
 export interface GetPublicKeyResponse {
     publicKey: string;
-    connectionKey: string;
+    /** Opaque and origin-scoped: hand it back on every sign, and send it nowhere else. */
+    walletRef: string;
 }
 
 /** What REQUEST_ACCESS answers with: the wallet's own network, not the one the page asked for. */
@@ -20,7 +21,10 @@ export interface ExternalRequestTxV1 {
 
 export interface ExternalRequestTxV2 {
     dataToSign: string;
-    connectionKey: string;
+    /** Absent from a bundle published before the field existed; `connectionKey` carries it there. */
+    walletRef?: string;
+    /** @deprecated What a bundle published before the rename sends; read, never written. */
+    connectionKey?: string;
     signType: SignType;
     type: EXTERNAL_SERVICE_TYPES;
     version: API_VERSION;

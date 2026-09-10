@@ -1,7 +1,7 @@
 import { requestPublicKey } from "./requests";
 import { ERROR_MESSAGES } from "../protocol/errors";
 import { NetworkId, networkOrLegacy } from "../networks";
-import { saveConnectionKey } from "./connectionKey";
+import { saveWalletRef } from "./walletRef";
 
 interface ConnectedWalletReply {
     publicKey: string;
@@ -17,8 +17,7 @@ interface ConnectedWalletReply {
 export const connectWallet = async (
     requested?: NetworkId,
 ): Promise<ConnectedWalletReply> => {
-    const { publicKey, connectionKey, network } =
-        await requestPublicKey(requested);
+    const { publicKey, walletRef, network } = await requestPublicKey(requested);
 
     // `requestPublicKey` already resolved the answer; only the ask can still be absent
     if (network !== networkOrLegacy(requested)) {
@@ -26,7 +25,7 @@ export const connectWallet = async (
         throw new Error(ERROR_MESSAGES.NETWORK_MISMATCH);
     }
 
-    saveConnectionKey(connectionKey, network);
+    saveWalletRef(walletRef, network);
 
     return { publicKey, network };
 };

@@ -10,6 +10,22 @@
   `SupportedNetwork`, `NetworkOptions` and `ConnectedWallet` types
 - Added distinct error strings for network and payload failures, so integrators can branch
   instead of parsing `Sign failed`
+- Added `"Reconnect the wallet to continue"`, raised when the extension does not recognise the
+  connection this page holds. Call `getPublicKey` again to recover
+- Added `"A wallet cannot be connected from this page"`, raised for a page with no origin to bind
+  a connection to — a `file://` document or a sandboxed frame
+
+## Security
+- The value the SDK keeps for a connected wallet is now an opaque, origin-scoped reference
+  minted by the extension, not the pairing key the backend accepts. A script on a connected
+  page can no longer read it and call the backend directly. No call changes shape
+- **Requires an extension that mints those references.** Against an older extension
+  `getPublicKey` resolves with an empty reference and every later signature is refused with
+  `"The connection key is missing"`
+- A session established before this release is not carried over. This SDK looks for a reference
+  the older bundle never stored, so the next signature is refused with `"The connection key is
+  missing"` until `getPublicKey` runs again; a page still on the older bundle holds the old value
+  and is refused with `"Reconnect the wallet to continue"` instead
 - Added the `@lobstrco/signer-extension-api/protocol` entry point: the message names, API
   version, error strings and request/response types the SDK shares with the extension
 

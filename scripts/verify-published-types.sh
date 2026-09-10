@@ -174,7 +174,7 @@ export const v1: ExternalRequestTxV1 = {
 };
 export const conn: ConnectionResponse = {
   publicKey: "G",
-  connectionKey: "k",
+  walletRef: "r",
   network: networkOrLegacy(undefined),
 };
 export const base: GetPublicKeyResponse = conn;
@@ -287,7 +287,7 @@ for (const [kind, mod] of [["esm", protoEsm], ["cjs", protoCjs]]) {
     assert.equal(mod.EXTERNAL_SERVICE_TYPES[key], key, `${kind} ${key} value differs from its key`);
   }
   assert.deepEqual([mod.API_VERSION.V1, mod.API_VERSION.V2, mod.API_VERSION.V3], [0, 1, 2], `${kind} API_VERSION`);
-  assert.equal(Object.keys(mod.ERROR_MESSAGES).length, 15, `${kind} wire literal count`);
+  assert.equal(Object.keys(mod.ERROR_MESSAGES).length, 17, `${kind} wire literal count`);
   assert.equal(mod.NETWORK.ripple, esm.NETWORK.ripple, `${kind} NETWORK differs from the root entry`);
   assert.equal(mod.networkOrLegacy(undefined), "stellar", `${kind} networkOrLegacy`);
 }

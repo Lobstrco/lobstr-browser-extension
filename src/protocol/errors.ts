@@ -24,4 +24,8 @@ export const ERROR_MESSAGES = {
     PAYLOAD_TOO_LARGE: "The transaction payload is too large",
     /** A message type this build predates — answered, so a later SDK need not time out. */
     REQUEST_NOT_SUPPORTED: "This request type is not supported",
+    /** Imperative where the rest describe: most dApps put this in front of the user unchanged. */
+    RECONNECT_REQUIRED: "Reconnect the wallet to continue",
+    /** A grant is bound to an origin, and these pages have none to bind to. */
+    ORIGIN_NOT_SUPPORTED: "A wallet cannot be connected from this page",
 } as const;

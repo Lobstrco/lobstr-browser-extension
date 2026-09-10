@@ -67,7 +67,7 @@ describe("what a dApp catches", () => {
         async (_label, call) => {
             mockedSend.mockResolvedValue({
                 publicKey: "G",
-                connectionKey: "k",
+                walletRef: "k",
                 signedData: "blob",
             });
 

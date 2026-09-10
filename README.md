@@ -330,7 +330,9 @@ values — compare `error.message` against them rather than parsing it:
 | `"No wallet connected on the requested network"` | The extension has no wallet on that network |
 | `"The connection key is missing"` | `signTransaction` or `signMessage` was called before `getPublicKey` connected a wallet on that network |
 | `"The data to sign is missing"` | The payload was empty or not a string |
-| `"Associated account not found"` | The wallet behind the stored connection was removed from the extension — connect again |
+| `"A wallet cannot be connected from this page"` | The page has no origin to bind a connection to — a `file://` document or a sandboxed frame |
+| `"Reconnect the wallet to continue"` | The extension does not recognise the reference this page holds — it was revoked, it belongs to another origin, or it predates the current extension. Call `getPublicKey` again |
+| `"Associated account not found"` | The wallet was removed from the extension while the access prompt stood open |
 | `"This type of signing is not supported on this network"` | e.g. `signMessage` on the XRP Ledger |
 | `"The transaction payload is not valid for this network"` | The payload is not in that network's grammar |
 | `"The transaction payload is too large"` | Over the size the network's signing path accepts |

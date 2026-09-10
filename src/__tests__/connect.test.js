@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import * as requests from "../internal/requests";
-import { CONNECTION_STORAGE_KEY } from "../internal/connectionKey";
+import { WALLET_REF_STORAGE_KEY } from "../internal/walletRef";
 import { ERROR_MESSAGES } from "../protocol/errors";
 import { NETWORK } from "../networks";
 import { getConnectedWallet } from "../getConnectedWallet";
@@ -11,7 +11,7 @@ vi.mock("../internal/requests", { spy: true });
 const answer = (network) =>
     vi.mocked(requests.requestPublicKey).mockResolvedValue({
         publicKey: "GWALLET",
-        connectionKey: "the-key",
+        walletRef: "the-key",
         network,
     });
 
@@ -26,10 +26,10 @@ describe("connecting a wallet", () => {
 
         await getConnectedWallet({ network: NETWORK.ripple });
 
-        expect(sessionStorage.getItem(`${CONNECTION_STORAGE_KEY}:ripple`)).toBe(
+        expect(sessionStorage.getItem(`${WALLET_REF_STORAGE_KEY}:ripple`)).toBe(
             "the-key",
         );
-        expect(sessionStorage.getItem(CONNECTION_STORAGE_KEY)).toBeNull();
+        expect(sessionStorage.getItem(WALLET_REF_STORAGE_KEY)).toBeNull();
     });
 
     it("refuses a wallet from a network the page did not ask for", async () => {
@@ -73,6 +73,16 @@ describe("connecting a wallet", () => {
             publicKey: "GWALLET",
             network: NETWORK.stellar,
         });
-        expect(sessionStorage.getItem(CONNECTION_STORAGE_KEY)).toBe("the-key");
+        expect(sessionStorage.getItem(WALLET_REF_STORAGE_KEY)).toBe("the-key");
+    });
+
+    it("clears the cell an older bundle left the real pairing key in", async () => {
+        // same tab, older bundle first: that value is the backend credential
+        sessionStorage.setItem("LOBSTR_CONNECTION_KEY", "the-real-key");
+        answer(NETWORK.stellar);
+
+        await getConnectedWallet();
+
+        expect(sessionStorage.getItem("LOBSTR_CONNECTION_KEY")).toBeNull();
     });
 });
