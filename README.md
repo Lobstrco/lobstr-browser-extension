@@ -371,8 +371,7 @@ npm run verify:types
 
 `npm run build` bundles with esbuild and emits the declarations with `tsc`; `npm run lint`,
 `npm run format:check` and `npm run typecheck` are what CI runs, and `npm run test:watch`
-keeps the tests running. Publishing is manual: `npm publish` builds through `prepack` and
-ships only what `files` in package.json lists.
+keeps the tests running.
 
 ## License
 
