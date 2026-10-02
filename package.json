@@ -6,11 +6,11 @@
     "description": "Utility functions to interact with LOBSTR extension",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/Lobstrco/lobstr-browser-extension.git"
+        "url": "git+https://github.com/Lobstrco/signer-extension-api.git"
     },
-    "homepage": "https://github.com/Lobstrco/lobstr-browser-extension#readme",
+    "homepage": "https://github.com/Lobstrco/signer-extension-api#readme",
     "bugs": {
-        "url": "https://github.com/Lobstrco/lobstr-browser-extension/issues"
+        "url": "https://github.com/Lobstrco/signer-extension-api/issues"
     },
     "main": "build/index.cjs",
     "module": "build/index.mjs",

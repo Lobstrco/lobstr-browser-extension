@@ -49,7 +49,7 @@ Release candidate of 3.0.0, published under the `next` dist-tag: `npm install
   installed package, so the types and the runtime cannot drift apart
 - The `import` condition ships its own ESM-flavoured declarations, so under Node-style
   TypeScript resolution the default import is typed as what the ESM build exports
-- The SDK lives in its own repository, https://github.com/Lobstrco/lobstr-browser-extension,
+- The SDK lives in its own repository, https://github.com/Lobstrco/signer-extension-api,
   and the published declarations now carry their doc comments
 
 ## Documentation
