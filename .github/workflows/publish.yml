@@ -1,0 +1,83 @@
+name: Publish
+
+# Every push to master runs the checks. When npm does not have the version in package.json
+# yet, it is published there and a GitHub release is created from its CHANGELOG.MD section.
+# Publishing goes through npm trusted publishing (OIDC): no token is stored in this repository.
+on:
+    push:
+        branches: [master]
+
+concurrency:
+    group: publish
+    cancel-in-progress: false
+
+permissions:
+    contents: read
+
+jobs:
+    checks:
+        uses: ./.github/workflows/ci.yml
+
+    gate:
+        runs-on: ubuntu-latest
+        outputs:
+            publish: ${{ steps.gate.outputs.publish }}
+            version: ${{ steps.gate.outputs.version }}
+            tag: ${{ steps.gate.outputs.tag }}
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 22
+
+            - name: Compare package.json with the registry
+              id: gate
+              run: node scripts/publish-gate.mjs
+
+    publish:
+        needs: [checks, gate]
+        if: needs.gate.outputs.publish == 'true'
+        runs-on: ubuntu-latest
+        # a required reviewer on this environment holds the release until someone approves it;
+        # its deployment-branch rule should allow master only
+        environment:
+            name: npm
+            url: https://www.npmjs.com/package/@lobstrco/signer-extension-api
+        permissions:
+            contents: write # the tag and the GitHub release
+            id-token: write # npm trusted publishing
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  persist-credentials: false
+
+            # trusted publishing needs npm 11.5.1 or newer, which Node 24 bundles
+            - uses: actions/setup-node@v4
+              with:
+                  node-version: 24
+                  cache: npm
+                  registry-url: https://registry.npmjs.org
+
+            - name: Install
+              run: npm ci
+
+            # `prepack` builds; npm attaches provenance on its own under trusted publishing
+            - name: Publish to npm
+              env:
+                  TAG: ${{ needs.gate.outputs.tag }}
+              run: npm publish --access public --tag "$TAG"
+
+            - name: Create the GitHub release
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  VERSION: ${{ needs.gate.outputs.version }}
+                  TAG: ${{ needs.gate.outputs.tag }}
+              run: |
+                  node scripts/changelog-section.mjs "$VERSION" > "$RUNNER_TEMP/notes.md"
+                  prerelease=()
+                  if [ "$TAG" = next ]; then prerelease=(--prerelease); fi
+                  gh release create "v$VERSION" --target "$GITHUB_SHA" --title "v$VERSION" \
+                      --notes-file "$RUNNER_TEMP/notes.md" "${prerelease[@]}"

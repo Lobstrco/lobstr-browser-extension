@@ -1,9 +1,10 @@
 name: CI
 
+# Pull requests run this directly; pushes to master run it through the Publish workflow,
+# which calls it before deciding whether there is a version to publish.
 on:
-    push:
-        branches: [master]
     pull_request:
+    workflow_call:
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -37,6 +38,10 @@ jobs:
 
             - name: Types
               run: npm run typecheck
+
+            # the version in package.json cannot ship without its release notes
+            - name: Changelog section
+              run: node scripts/changelog-section.mjs > /dev/null
 
             # before the tests: the node suite imports the built package
             - name: Build
