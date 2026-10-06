@@ -1,8 +1,3 @@
-# v3.0.0-rc.1
-
-Release candidate of 3.0.0, published under the `next` dist-tag: `npm install
-@lobstrco/signer-extension-api@next`. The notes below describe the whole 3.0.0 release.
-
 # v3.0.0
 
 ## New features
@@ -56,6 +51,9 @@ Release candidate of 3.0.0, published under the `next` dist-tag: `npm install
 - Documented the network API, the published module formats, the protocol entry point and
   every dApp-visible error string
 - Corrected the browser global: it is `window.lobstrExtensionApi`
+- Documented what `signTransaction` returns on each network: the signed envelope as base64 XDR
+  on Stellar, the signed transaction as a hex `tx_blob` on the XRP Ledger, where LOBSTR also
+  sets `Fee`, `Sequence` and `LastLedgerSequence`
 
 # v2.1.0
 
