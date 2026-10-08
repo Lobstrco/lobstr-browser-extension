@@ -233,6 +233,17 @@ Signs a transaction as the user and returns the result to your application.
 transaction JSON on the XRP Ledger. What comes back follows that network's `broadcaster`: with
 `"dapp"` (both networks today) you get the signed transaction and submit it yourself.
 
+The signed transaction comes back in the network's own grammar too:
+
+| Network | You send | You get back |
+|---|---|---|
+| Stellar | base64 XDR envelope | the signed envelope, base64 XDR |
+| XRP Ledger | transaction JSON | the signed transaction as a hex-encoded binary blob (`tx_blob`), ready for `submit` |
+
+On the XRP Ledger, LOBSTR sets `Fee`, `Sequence` and `LastLedgerSequence` when it signs, so read
+the final values — and the transaction hash — from the returned blob, not from the JSON you sent.
+LOBSTR does not submit the transaction.
+
 *NOTE:* The payload must be valid for the network you name, or the call is refused before the
 user is ever prompted.
 
@@ -256,6 +267,22 @@ const userSignTransaction = async (xdr: string): Promise<string> => {
 
   return signedTransaction;
 };
+```
+
+On the XRP Ledger, with [xrpl.js](https://www.npmjs.com/package/xrpl):
+
+```typescript
+import { NETWORK, signTransaction } from "@lobstrco/signer-extension-api";
+import { Client, decode, hashes } from "xrpl";
+
+const txBlob = await signTransaction(JSON.stringify(txJson), { network: NETWORK.ripple });
+
+const signed = decode(txBlob); // the transaction as signed, with LOBSTR's Fee and Sequence
+const hash = hashes.hashSignedTx(txBlob);
+
+const client = new Client("wss://xrplcluster.com");
+await client.connect();
+await client.submit(txBlob);
 ```
 
 ### signMessage
@@ -327,7 +354,6 @@ values — compare `error.message` against them rather than parsing it:
 | `"User declined access"` | The user closed the prompt or rejected it in the app |
 | `"Network is not supported"` | This extension build does not know the network you named |
 | `"The connected wallet belongs to a different network"` | The wallet answered on a network other than the one you asked for |
-| `"No wallet connected on the requested network"` | The extension has no wallet on that network |
 | `"The connection key is missing"` | `signTransaction` or `signMessage` was called before `getPublicKey` connected a wallet on that network |
 | `"The data to sign is missing"` | The payload was empty or not a string |
 | `"A wallet cannot be connected from this page"` | The page has no origin to bind a connection to — a `file://` document or a sandboxed frame |
