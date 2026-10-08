@@ -354,7 +354,6 @@ values — compare `error.message` against them rather than parsing it:
 | `"User declined access"` | The user closed the prompt or rejected it in the app |
 | `"Network is not supported"` | This extension build does not know the network you named |
 | `"The connected wallet belongs to a different network"` | The wallet answered on a network other than the one you asked for |
-| `"No wallet connected on the requested network"` | The extension has no wallet on that network |
 | `"The connection key is missing"` | `signTransaction` or `signMessage` was called before `getPublicKey` connected a wallet on that network |
 | `"The data to sign is missing"` | The payload was empty or not a string |
 | `"A wallet cannot be connected from this page"` | The page has no origin to bind a connection to — a `file://` document or a sandboxed frame |
